@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>SupportPulse AI · Operations Intelligence</title>
+  <link rel="stylesheet" href="/style.css" />
+  <script src="/ui.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="identity"><span class="logo">◈</span><div><strong>SupportPulse<span class="ai"> AI</span></strong><small>OPERATIONS INTELLIGENCE</small></div></div>
+      <div class="company"><span class="company-icon">DS</span><div><b>Demo Studio</b><small>Synthetic workspace</small></div><span class="company-dot">●</span></div>
+      <div class="nav-title">WORKSPACE</div>
+      <nav aria-label="Main navigation">
+        <a class="active" href="#overview">▦ <span>Overview</span></a>
+        <a href="#cases">◉ <span>Cases &amp; Evidence</span></a>
+        <a href="#sources">◫ <span>Data Health</span></a>
+        <a href="#workflow">◷ <span>Workflow</span></a>
+      </nav>
+      <div class="side-bottom"><span class="lock">⬡</span><p><strong>Demo / synthetic only</strong><br>Реальные клиенты и интеграции отключены.</p></div>
+    </aside>
+    <main>
+      <header class="topbar"><div><span class="breadcrumb">Workspace</span><span class="divider">/</span><strong>Executive Overview</strong></div><div class="topright"><span class="live-dot"></span> LOCAL DEMO <span class="divider">|</span> v0.1.0</div></header>
+      <div class="content" id="overview">
+        <div class="header-row"><div><div class="eyebrow">DECISION INTELLIGENCE <span class="eyebrow-line"></span> FIRST ENGINEERING SLICE</div><h1>Чёткая картина.<br><span>Проверяемые действия.</span></h1><p>Заметить нарушение, проверить источник и устранить проблему — с доказательствами и полной историей решений.</p></div><div class="date-note"><span>●</span><div>Источники<br><b id="sourceHealthHeadline">Нет данных</b></div></div></div>
+        <section class="access-panel" aria-label="Demo connection"><div class="panel-icon">⌘</div><div class="access-text"><strong>Доступ к локальной демонстрации</strong><span>Введите тестовый токен из README. Он используется только в этом браузерном сеансе.</span></div><input id="token" type="password" autocomplete="off" placeholder="Demo supervisor token" aria-label="Demo bearer token" /><button id="connect" class="button primary">Подключиться →</button></section>
+        <div id="message" role="status" aria-live="polite" class="toast hidden"></div>
+        <div class="kpis" aria-label="Key metrics">
+          <div class="kpi"><div class="kpi-head">НА ПРОВЕРКУ <span>↗</span></div><div id="reviewCount" class="kpi-value">—</div><div class="kpi-caption">Сигналы, не обвинения</div></div>
+          <div class="kpi"><div class="kpi-head">ПОДТВЕРЖДЁННЫЕ <span>▤</span></div><div id="confirmedCount" class="kpi-value">—</div><div class="kpi-caption">Просрочки с проверкой</div></div>
+          <div class="kpi"><div class="kpi-head">ДЕЙСТВИЯ ЗАВЕРШЕНЫ <span>✓</span></div><div id="verifiedCount" class="kpi-value">—</div><div class="kpi-caption">По событию источника</div></div>
+          <div class="kpi"><div class="kpi-head">FOLLOW-UP В СРОК <span>◷</span></div><div id="onTimeRate" class="kpi-value">—</div><div class="kpi-caption" id="rateBasis">Нет достаточных данных</div></div>
+        </div>
+        <div class="main-grid">
+          <section class="panel" id="workflow"><div class="panel-heading"><div><div class="eyebrow">CONTROL LOOP</div><h2>От сигнала к результату</h2></div><span class="label">RULE-BASED</span></div>
+            <div class="pipeline"><div class="step"><span>01</span><div><b>Источник</b><small>Нормализация и проверка синхронизации</small></div></div><div class="step"><span>02</span><div><b>Обещание</b><small>Чёткий срок, ссылка на сообщение</small></div></div><div class="step"><span>03</span><div><b>Проверка</b><small>Подтверждение руководителем</small></div></div><div class="step"><span>04</span><div><b>Исправление</b><small>Проверка факта отправки</small></div></div></div>
+            <div class="demo-actions"><button id="seed" class="button secondary">① Загрузить пример</button><button id="followup" class="button outline">② Импортировать исправление</button></div>
+          </section>
+          <section class="panel" id="sources"><div class="panel-heading"><div><div class="eyebrow">DATA INTEGRITY</div><h2>Качество источников</h2></div><span class="label green">TRACEABLE</span></div><div id="sourceList" class="source-items"><div class="empty">Источники ещё не загружены</div></div><div class="integrity-note"><span>ⓘ</span> Если данных недостаточно, система не объявляет менеджера виновным.</div></section>
+        </div>
+        <section class="panel cases" id="cases"><div class="panel-heading"><div><div class="eyebrow">ACTION QUEUE</div><h2>Кейсы и доказательства</h2></div><button id="refresh" class="button outline">↻ Обновить</button></div><div id="casesList"><div class="empty big">Сначала подключитесь и загрузите синтетический пример</div></div></section>
+        <section class="panel detail hidden" id="detailPanel"><div class="panel-heading"><div><div class="eyebrow">EVIDENCE VIEW</div><h2 id="detailTitle">Карточка кейса</h2></div><button id="closeDetail" class="button outline">Закрыть ✕</button></div><div id="detailContent"></div><div id="detailActions" class="detail-actions"></div></section>
+        <footer><span>© Maya AI Systems · SupportPulse AI</span><span>Синтетические данные · финансовый эффект неизвестен · production-ready: NO</span></footer>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

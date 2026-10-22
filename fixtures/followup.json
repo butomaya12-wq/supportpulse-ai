@@ -1,0 +1,9 @@
+{
+  "import": {
+    "source_id": "demo-instagram", "channel": "instagram-synthetic", "watermark": "2026-10-22T14:15:00Z", "healthy": true,
+    "events": [
+      {"external_id": "msg-003", "event_time": "2026-10-22T14:12:00Z", "kind": "quote_sent", "conversation_id": "demo-lead-001", "actor_id": "demo-manager-001", "message": "Отправила расчёт, файл quote-demo-001.pdf (синтетическое событие отправки)."}
+    ]
+  },
+  "evaluate_as_of": "2026-10-22T14:15:00Z"
+}

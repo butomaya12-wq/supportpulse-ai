@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: supportpulse
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-synthetic-local-only}
+      POSTGRES_DB: supportpulse
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U supportpulse -d supportpulse"]
+      interval: 4s
+      timeout: 3s
+      retries: 15
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      SP_MODE: synthetic_local
+      DATABASE_URL: postgresql+psycopg://supportpulse:${POSTGRES_PASSWORD:-synthetic-local-only}@db:5432/supportpulse
+      SP_SUPERVISOR_TOKEN: ${SP_SUPERVISOR_TOKEN:-dev-only-supervisor-token}
+      SP_MANAGER_TOKEN: ${SP_MANAGER_TOKEN:-dev-only-manager-token}
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  postgres_data:

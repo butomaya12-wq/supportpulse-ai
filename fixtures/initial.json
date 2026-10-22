@@ -1,0 +1,11 @@
+{
+  "import": {
+    "source_id": "demo-instagram", "channel": "instagram-synthetic", "watermark": "2026-10-22T14:00:00Z", "healthy": true,
+    "events": [
+      {"external_id": "msg-001", "event_time": "2026-10-22T07:05:00Z", "kind": "customer_message", "conversation_id": "demo-lead-001", "actor_id": "synthetic-customer", "message": "Здравствуйте! Сколько стоит кухня на заказ?"},
+      {"external_id": "msg-002", "event_time": "2026-10-22T07:18:00Z", "kind": "manager_message", "conversation_id": "demo-lead-001", "actor_id": "demo-manager-001", "message": "Отправлю расчёт сегодня до 16:00."}
+    ]
+  },
+  "commitment": {"source_id": "demo-instagram", "basis_external_id": "msg-002", "due_at": "2026-10-22T16:00:00+03:00"},
+  "evaluate_as_of": "2026-10-22T14:00:00Z"
+}
