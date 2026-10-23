@@ -1,8 +1,8 @@
 # SupportPulse AI — explainable customer-follow-up control
 
-**Status: Engineering iteration 001 / synthetic local demo / NOT production-ready.**
+**Status: Engineering iteration 004 / synthetic local demo / NOT production-ready.**
 
-SupportPulse AI is an independent application under development at Maya AI Systems. It aims to help teams identify a verifiable broken commitment in a customer conversation, confirm a case with a human reviewer, assign remediation, and track a source-confirmed action. The larger product vision includes AI-assisted communication quality and operational economics; those features are NOT implemented here.
+SupportPulse AI is an independent application under development at Maya AI Systems. It aims to help teams identify a verifiable broken commitment in a customer conversation, confirm a case with a human reviewer, assign remediation, and track a source-confirmed action. The larger vision includes omnichannel communication quality and operational economics; those broader capabilities are NOT implemented. Iteration 004 introduces source-linked promise **proposals**, still requiring human approval.
 
 This codebase is original and separate from the existing HandoffGuard AI project. No live messenger, CRM integration, autonomous staff scoring, actual recovered revenue, hosted deployment or real customer data is included.
 
@@ -14,6 +14,7 @@ This codebase is original and separate from the existing HandoffGuard AI project
 - Ingestion: bounded synthetic events, unique provider keys and conflict rejection.
 - Business logic: **human-approved** explicit due date, 30-minute source-watermark guard, candidate overdue vs unknown, review, task assignment and verified provider send event.
 - Integrity: tenant-scoped reads, role restrictions, append-only audit events, missing-data abstention and null financial impact.
+- Iteration 004: read-only promise proposals from immutable manager messages, strict source/time validation, explicit human approval; deterministic baseline by default (**not a real LLM**), optional off-by-default real-model adapter not evaluated with live model calls.
 
 ## Quick start — Docker and Postgres
 
@@ -70,6 +71,7 @@ The SQLite file stays in the working folder and is ignored by Git. Environment-v
 - [Evidence/acceptance traceability](docs/TRACEABILITY.md)
 - [Buyer discovery questions](docs/BUYER_DISCOVERY.md)
 - [Agent process and guardrails](AGENTS.md)
+- [Guarded AI promise proposals and evaluation limits](docs/AI_PROMISE_EXTRACTION_v0.1.md)
 
 ## Publishing a *new* GitHub repository
 
@@ -96,3 +98,11 @@ Discovery documents are hypotheses. There are no verified buyer interviews or pe
 ## Iteration 002 verification UX and PostgreSQL checks
 
 The case-detail API returns `verification` with `ready`, `proof_external_id`, and a `reason` code. The dashboard only enables verification when qualifying source evidence is present and continues to require explicit human confirmation. User-facing errors and denominator descriptions explain the synthetic limitation. CI adds an isolated PostgreSQL service with idempotence and degraded-coverage checks. These are engineering tests, not production readiness.
+
+## Iteration 004 — evidence-first AI promise proposals
+
+The new dashboard panel **«Предложения по обещаниям»** accepts synthetic source and conversation IDs. Try `demo-instagram` and `demo-lead-001` after loading the example. It displays a source-linked quote and explicit due time; only the supervisor can select **«Проверить и утвердить человеком»**. The original deterministic approval and evaluation pipeline remains unchanged.
+
+**Important:** the default `SP_AI_PROVIDER=rules` is an explicitly labeled **deterministic baseline, not an LLM**. A genuine OpenAI Responses API JSON-Schema adapter exists, but is **not selected in Docker/CI, has not been invoked with a live model, and must not be described as a verified AI capability**. Model output is always validated against immutable source text and due time; on ambiguity, abstain. The workflow remains synthetic-only, and no third-party messages are sent by default.
+
+For exact API sample, safety properties, environment opt-in, and tiny synthetic evaluation see [AI promise extraction spec](docs/AI_PROMISE_EXTRACTION_v0.1.md). The test evidence is not proof of model accuracy, financial recovery, or production readiness.
