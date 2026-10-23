@@ -19,6 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker compose config --quiet
+      - run: docker compose -f compose.yaml -f compose.telemetry.yaml config --quiet
       - run: docker build -t supportpulse-synthetic-ci .
   postgres-integration:
     runs-on: ubuntu-latest
