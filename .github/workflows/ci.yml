@@ -45,3 +45,64 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements-dev.txt
       - run: pytest -q tests/test_postgres.py
+  browser-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: supportpulse_e2e
+          POSTGRES_PASSWORD: disposable-ci-only
+          POSTGRES_DB: supportpulse_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U supportpulse_e2e -d supportpulse_e2e"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      SP_MODE: synthetic_local
+      DATABASE_URL: postgresql+psycopg://supportpulse_e2e:disposable-ci-only@127.0.0.1:5432/supportpulse_e2e
+      SP_SUPERVISOR_TOKEN: isolated-e2e-supervisor
+      SP_MANAGER_TOKEN: isolated-e2e-manager
+      SUPPORTPULSE_E2E_ISOLATED: "YES"
+      E2E_BASE_URL: http://127.0.0.1:18080
+      E2E_SUPERVISOR_TOKEN: isolated-e2e-supervisor
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install backend and browser test dependencies
+        run: pip install -r requirements-e2e.txt
+      - name: Install headless Chromium
+        run: python -m playwright install --with-deps chromium
+      - name: Start isolated test application
+        run: |
+          nohup python -m uvicorn app.main:app --host 127.0.0.1 --port 18080 >/tmp/supportpulse-e2e-web.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl --silent --show-error --fail http://127.0.0.1:18080/health >/dev/null 2>&1; then
+              echo "Synthetic-only localhost API is ready."
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/supportpulse-e2e-web.log
+          exit 1
+      - name: Browser evidence-first scenarios
+        run: |
+          mkdir -p artifacts/browser-e2e
+          pytest -q e2e/ --junitxml=artifacts/browser-e2e/junit.xml
+      - name: Upload browser evidence and junit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-e2e-evidence
+          path: artifacts/browser-e2e/
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Print app logs when browser tests fail
+        if: failure()
+        run: tail -n 150 /tmp/supportpulse-e2e-web.log
