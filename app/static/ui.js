@@ -80,6 +80,37 @@
     });
     $('detailPanel').scrollIntoView({behavior:'smooth',block:'start'});
   }
+  let pendingSuggestions = [];
+  $('analyze').onclick = () => exec(async () => {
+    pendingSuggestions = [];
+    const source_id = $('aiSource').value.trim();
+    const conversation_id = $('aiConversation').value.trim();
+    const result = await api('ai/proposals', 'POST', {source_id, conversation_id});
+    const sourceLabel = result.provider === 'RULE_BASELINE_NOT_AI'
+      ? 'Детерминированные правила — НЕ языковая модель'
+      : result.provider === 'OPENAI' ? 'Внешняя языковая модель (вывод требует проверки)'
+      : 'AI-провайдер выключен';
+    pendingSuggestions = result.proposals;
+    let content = `<p class="ai-note"><b>${safe(sourceLabel)}</b>. Предложений: ${result.proposals.length}, отказов от вывода: ${result.abstentions.length}. Только синтетические данные.</p>`;
+    if(!result.proposals.length) content += '<p class="ai-note">Подтверждённого обещания с точным сроком не найдено. Ничего не создаётся.</p>';
+    result.proposals.forEach((item, i) => {
+      content += `<div class="ai-item"><b>Цитата из ${safe(item.basis_external_id)}:</b><p>${safe(item.evidence_quote)}</p><small>Срок: ${safe(fmt(item.due_at))} · ${safe(item.actor_id)} · уверенность не измерена</small><div><button class="button outline" data-ai-approve="${i}">Проверить и утвердить человеком →</button></div></div>`;
+    });
+    $('aiResults').innerHTML = content;
+    document.querySelectorAll('[data-ai-approve]').forEach(button => button.addEventListener('click', () => exec(async () => {
+      const suggestion = pendingSuggestions[Number(button.dataset.aiApprove)];
+      if (!suggestion) throw Error('Предложение устарело — запустите проверку повторно');
+      if (!confirm(`Проверьте исходную цитату и срок: ${suggestion.evidence_quote}\n${fmt(suggestion.due_at)}\nПодтвердить вручную?`)) return;
+      const outcome = await api('commitments','POST',{
+        source_id:suggestion.source_id, basis_external_id:suggestion.basis_external_id,
+        due_at:suggestion.due_at, action_type:'send_quote'
+      });
+      toast(outcome.created ? 'Обещание одобрено человеком, записано в журнал' : 'Такое обещание уже было утверждено ранее');
+      await api('evaluate','POST');
+      await refresh();
+    })));
+  });
+
   $('connect').onclick=()=>exec(async()=>{token=$('token').value.trim();await api('me');$('token').value='';toast('Подключено: локальная синтетическая демонстрация');await refresh()});
   $('seed').onclick=()=>exec(async()=>{await api('demo/seed','POST');toast('Первый синтетический кейс загружен');await refresh()});
   $('followup').onclick=()=>exec(async()=>{await api('demo/followup','POST');toast('Импортирован подтверждённый факт отправки (не факт доставки)');await refresh()});
