@@ -38,3 +38,9 @@ class AssignIn(BaseModel):
 
 class VerifyIn(BaseModel):
     proof_external_id: str = Field(min_length=1, max_length=100)
+
+
+class AIProposalsIn(BaseModel):
+    """Select source-owned events only; callers cannot inject arbitrary message text."""
+    source_id: str = Field(min_length=1, max_length=80)
+    conversation_id: str = Field(min_length=1, max_length=100)
