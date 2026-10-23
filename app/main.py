@@ -4,7 +4,7 @@ import os
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -15,6 +15,7 @@ from .schemas import ImportIn, CommitmentIn, ReviewIn, AssignIn, VerifyIn, AIPro
 from .service import as_utc, audit, evaluate, finding_detail, get_action, get_finding, overview
 from .ai_extract import provider_name, propose
 from .telemetry import setup_telemetry, add_stdout_safe_log, instrument_request
+from .fault_drill import synthetic_overview_failure_enabled
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -202,8 +203,12 @@ def run_evaluation(as_of: datetime | None = None, user: Principal = Depends(requ
 
 
 @app.get("/api/v1/overview")
-def get_overview(user: Principal = Depends(require_user), db: Session = Depends(db_session)):
+def get_overview(request: Request, user: Principal = Depends(require_user), db: Session = Depends(db_session)):
     supervisor_only(user)
+    # Explicit opt-in probe ONLY. Normal dashboard clients never get a simulated
+    # error, even when the local alert-drill overlay is enabled.
+    if synthetic_overview_failure_enabled(request):
+        raise HTTPException(503, "SYNTHETIC_ONLY: overview unavailable during controlled drill")
     return overview(db, user.tenant_id)
 
 
