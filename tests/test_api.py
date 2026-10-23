@@ -35,6 +35,7 @@ def test_seed_and_full_human_workflow(ctx,supervisor):
     r=c.post('/api/v1/demo/followup',headers=supervisor)
     assert r.status_code==200, r.text
     assert c.get(f'/api/v1/findings/{n}',headers=supervisor).json()['state']=='FULFILLED_LATE'
+    assert c.get('/api/v1/overview',headers=supervisor).json()['counts']['confirmed_overdue']==1
     verified=c.post(f'/api/v1/actions/{action["action_id"]}/verify',headers=supervisor,json={'proof_external_id':'msg-003'})
     assert verified.status_code==200, verified.text
     assert verified.json()['delivery_confirmed'] is False
@@ -163,3 +164,46 @@ def test_bounced_quote_never_counted_as_corrected(ctx,supervisor,initial):
     c.post('/api/v1/evaluate',headers=supervisor,params={'as_of':'2026-10-22T15:00:00Z'})
     assert c.get(f'/api/v1/findings/{n}',headers=supervisor).json()['state']=='SENT_UNCONFIRMED_DELIVERY'
     assert c.post(f'/api/v1/actions/{action_id}/verify',headers=supervisor,json={'proof_external_id':'sent-001'}).status_code==409
+
+
+def test_verification_requires_matching_source_proof(ctx, supervisor):
+    c, _ = ctx
+    n = c.post('/api/v1/demo/seed', headers=supervisor).json()['evaluation']['findings'][0]['finding_id']
+    c.post(f'/api/v1/findings/{n}/review', headers=supervisor,
+           json={'decision': 'CONFIRM', 'reason': 'No valid source evidence of on-time send'})
+    action = c.post(f'/api/v1/findings/{n}/actions', headers=supervisor,
+                    json={'owner_id': 'demo-manager-001'}).json()['action_id']
+    before = c.get(f'/api/v1/findings/{n}', headers=supervisor).json()
+    assert before['verification'] == {'ready': False, 'proof_external_id': None, 'reason': 'NO_SOURCE_PROOF'}
+    assert c.post(f'/api/v1/actions/{action}/verify', headers=supervisor,
+                  json={'proof_external_id': 'msg-003'}).status_code == 409
+    assert c.post('/api/v1/demo/followup', headers=supervisor).status_code == 200
+    after = c.get(f'/api/v1/findings/{n}', headers=supervisor).json()
+    assert after['verification'] == {'ready': True, 'proof_external_id': 'msg-003', 'reason': 'PROOF_AVAILABLE'}
+    assert c.post(f'/api/v1/actions/{action}/verify', headers=supervisor,
+                  json={'proof_external_id': 'msg-002'}).status_code == 409
+    assert c.post(f'/api/v1/actions/{action}/verify', headers=supervisor,
+                  json={'proof_external_id': 'msg-003'}).status_code == 200
+    done = c.get(f'/api/v1/findings/{n}', headers=supervisor).json()
+    assert done['verification']['reason'] == 'ALREADY_VERIFIED'
+    assert done['corrective_action']['state'] == 'VERIFIED'
+
+
+def test_bounced_evidence_not_eligible_for_verification(ctx, supervisor, initial):
+    c, _ = ctx
+    n = submit(c, supervisor, initial)
+    c.post(f'/api/v1/findings/{n}/review', headers=supervisor,
+           json={'decision': 'CONFIRM', 'reason': 'Promised quote missing from healthy source'})
+    c.post(f'/api/v1/findings/{n}/actions', headers=supervisor,
+           json={'owner_id': 'demo-manager-001'})
+    followup = {'source_id': 'demo-instagram', 'channel': 'instagram-synthetic',
+                'watermark': '2026-10-22T15:00:00Z', 'healthy': True, 'events': [
+                   {'external_id': 's1', 'event_time': '2026-10-22T14:12:00Z', 'kind': 'quote_sent',
+                    'conversation_id': 'demo-lead-001', 'actor_id': 'demo-manager-001', 'message': 'quote sent'},
+                   {'external_id': 'b1', 'event_time': '2026-10-22T14:15:00Z', 'kind': 'quote_bounced',
+                    'conversation_id': 'demo-lead-001', 'actor_id': 'demo-manager-001', 'message': 'quote bounced'}]}
+    assert c.post('/api/v1/imports', headers=supervisor, json=followup).status_code == 200
+    c.post('/api/v1/evaluate', headers=supervisor, params={'as_of': '2026-10-22T15:00:00Z'})
+    f = c.get(f'/api/v1/findings/{n}', headers=supervisor).json()
+    assert f['verification']['ready'] is False
+    assert f['verification']['reason'] == 'BOUNCED'

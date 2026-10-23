@@ -27,7 +27,7 @@ docker compose up --build -d
 
 For the local test screen, use `dev-only-supervisor-token` in the token field unless overridden with `SP_SUPERVISOR_TOKEN` in a local `.env` file. These are intentionally **demo-only** example values, never production credentials. Docker Compose binds the app to `127.0.0.1` only.
 
-Click **Load example** to import the initial event and identify a candidate overdue quote. Open the case, **confirm** the missed commitment and **assign** it. Click **Import correction**, then **Verify** the provider event with `msg-003`. Only sending is verified, NOT receipt, payment or recovered revenue.
+Click **Load example** to import the initial event and identify a candidate overdue quote. Open the case, **confirm** the missed commitment and **assign** it. Click **Import correction**. The case then offers **Verify** with the matching `msg-003` proof; the verify button stays unavailable before source proof exists. Only sending is verified, NOT receipt, payment or recovered revenue.
 
 ```bash
 # Optional terminal API checks (synthetic only)
@@ -92,3 +92,7 @@ git push -u origin main
 ## Product research status
 
 Discovery documents are hypotheses. There are no verified buyer interviews or permissions for real sources in this codebase. Data minimization and operational / employee fairness review are mandatory before commercial use.
+
+## Iteration 002 verification UX and PostgreSQL checks
+
+The case-detail API returns `verification` with `ready`, `proof_external_id`, and a `reason` code. The dashboard only enables verification when qualifying source evidence is present and continues to require explicit human confirmation. User-facing errors and denominator descriptions explain the synthetic limitation. CI adds an isolated PostgreSQL service with idempotence and degraded-coverage checks. These are engineering tests, not production readiness.
