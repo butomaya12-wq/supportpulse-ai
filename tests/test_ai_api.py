@@ -16,7 +16,7 @@ def test_proposals_are_read_only_and_do_not_approve_or_accuse(ctx, supervisor, i
     data = response.json()
     assert data["provider"] == "RULE_BASELINE_NOT_AI"
     assert data["review_required"] is True
-    assert data["external_model_invoked"] is False
+    assert data["external_model_selected"] is False
     assert len(data["proposals"]) == 1
     proposed = data["proposals"][0]
     assert proposed["status"] == "PROPOSED_NOT_APPROVED"
