@@ -12,6 +12,7 @@
 | Iteration 002 merged | 2026-10-23 07:26:20 | GitHub `6ff30c83d6033fca093435c3e2dbd10a24dfac67` | Verification UX / PostgreSQL tests |
 | Iteration 003 merged | 2026-10-23 08:58:47 | GitHub `643436dc414c44c2e96a1f79f2054c8f6316eb82` | Browser E2E |
 | Iteration 004 merged | 2026-10-23 14:08:39 | GitHub `0f7fd10d97dfc6278a0bb97dac02704558fb629f` | Guarded promise proposals / synthetic model mocks |
+| Iteration 005 observability merged | 2026-10-23 18:09:53 | GitHub `c5142b2758f29c97b3f59084af9e2e70d6b78c28` | OpenTelemetry instrumentation and optional local Grafana overlay; Grafana UI proof still pending |
 
 ## Current snapshot
 
@@ -42,3 +43,12 @@ Proposed table for future sessions:
 | Not yet tracked | — | — | — | — | — |
 
 **Submission rule:** use only confirmed net working hours for the course field. For narrative write-ups, it is acceptable to report the clearly labeled calendar elapsed span since engineering start. These are different measurements.
+
+## Observed assistant-led engineering session: iteration 005
+
+- **Session started:** 2026-10-23 **17:56:49 UTC** (22:56:49 at UTC+05), source: user-local time service reading during session.
+- **Snapshot after merging:** 2026-10-23 **18:10:01 UTC** (23:10:01 at UTC+05), source: user-local time service reading.
+- **Elapsed session window:** **13 min 12 sec**. This includes tool execution and any idle time; **not equivalent to user's active hands-on hours**.
+- **Deliverables:** PR #13, correlated request tracing/logging/metrics, 34 Python tests, 3 browser E2E, Docker CI, optional Grafana overlay.
+- **Human active work time:** **UNKNOWN**; no user stopwatch / confirmed break report.
+- **Next milestone:** actual Grafana UI proof and a new timestamped owner-local review session.
