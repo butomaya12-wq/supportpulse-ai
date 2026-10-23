@@ -92,6 +92,23 @@ def evaluate(db: Session, tenant: str, actor: str, as_of: datetime | None = None
     return updated
 
 
+
+def verification_readiness(db: Session, f: m.Finding, c: m.Commitment, action: m.CorrectiveAction | None) -> dict:
+    """Suggest matching source evidence; the verify endpoint remains authoritative."""
+    if action is None:
+        return {"ready": False, "proof_external_id": None, "reason": "NO_ACTION"}
+    if action.state == "VERIFIED":
+        return {"ready": False, "proof_external_id": None, "reason": "ALREADY_VERIFIED"}
+    if f.state not in ("CONFIRMED_OVERDUE", "FULFILLED_LATE", "SENT_UNCONFIRMED_DELIVERY"):
+        return {"ready": False, "proof_external_id": None, "reason": "CASE_NOT_VERIFIABLE"}
+    events = get_events_for_commitment(db, c)
+    if any(e.kind == "quote_bounced" for e in events):
+        return {"ready": False, "proof_external_id": None, "reason": "BOUNCED"}
+    sent = next((e for e in events if e.kind == "quote_sent" and e.actor_id == c.actor_id), None)
+    if sent is None:
+        return {"ready": False, "proof_external_id": None, "reason": "NO_SOURCE_PROOF"}
+    return {"ready": True, "proof_external_id": sent.external_id, "reason": "PROOF_AVAILABLE"}
+
 def finding_detail(db: Session, f: m.Finding) -> dict:
     c = db.get(m.Commitment, f.commitment_id)
     basis = db.get(m.SourceEvent, c.basis_event_id)
@@ -104,6 +121,7 @@ def finding_detail(db: Session, f: m.Finding) -> dict:
             "review": {"by": f.reviewed_by, "reason": f.review_reason} if f.reviewed_by else None,
             "corrective_action": {"id": action.id, "owner_id": action.owner_id, "state": action.state,
                                   "proof_event_id": action.proof_event_id} if action else None,
+            "verification": verification_readiness(db, f, c, action),
             "quality_state": "INSUFFICIENT_DATA" if f.state == "INSUFFICIENT_DATA" else "VALID",
             "impact_rub": None, "ai_inferred": False}
 
