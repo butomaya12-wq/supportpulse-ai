@@ -35,6 +35,7 @@ def test_seed_and_full_human_workflow(ctx,supervisor):
     r=c.post('/api/v1/demo/followup',headers=supervisor)
     assert r.status_code==200, r.text
     assert c.get(f'/api/v1/findings/{n}',headers=supervisor).json()['state']=='FULFILLED_LATE'
+    assert c.get('/api/v1/overview',headers=supervisor).json()['counts']['confirmed_overdue']==1
     verified=c.post(f'/api/v1/actions/{action["action_id"]}/verify',headers=supervisor,json={'proof_external_id':'msg-003'})
     assert verified.status_code==200, verified.text
     assert verified.json()['delivery_confirmed'] is False
