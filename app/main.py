@@ -116,7 +116,7 @@ def ai_promise_proposals(payload: AIProposalsIn, user: Principal = Depends(requi
         "source_id": payload.source_id,
         "conversation_id": payload.conversation_id,
         "provider": "RULE_BASELINE_NOT_AI" if provider == "rules" else provider.upper(),
-        "external_model_invoked": provider == "openai",
+        "external_model_selected": provider == "openai",
         "review_required": True,
         "data_mode": "SYNTHETIC_ONLY",
         "proposals": [],
