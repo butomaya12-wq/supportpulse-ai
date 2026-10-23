@@ -1,0 +1,9 @@
+# Opt-in local fault/alert exercise, on top of compose + compose.telemetry.
+# Never edit/revert the user's local compose.yaml or persistent Postgres volume.
+services:
+  web:
+    environment:
+      SP_FAULT_DRILL_ENABLED: "1"
+  telemetry:
+    volumes:
+      - ./ops/grafana/alerting/overview-5xx.yaml:/otel-lgtm/grafana/conf/provisioning/alerting/supportpulse-overview-5xx.yaml:ro
