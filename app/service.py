@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from . import models as m
+from .telemetry import mark_audit_queued
 
 GRACE = timedelta(minutes=30)
 
@@ -22,6 +23,7 @@ def event_to_dict(ev: m.SourceEvent) -> dict:
 
 def audit(db: Session, tenant: str, actor: str, target: str, action: str,
           old: str | None = None, new: str | None = None, note: str | None = None):
+    mark_audit_queued(action)
     db.add(m.Audit(tenant_id=tenant, actor=actor, target=target, action=action,
                    old_state=old, new_state=new, note=note))
 

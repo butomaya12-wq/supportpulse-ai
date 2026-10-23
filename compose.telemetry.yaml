@@ -1,0 +1,13 @@
+services:
+  web:
+    environment:
+      SP_TELEMETRY_ENABLED: "1"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry:4318
+  telemetry:
+    image: grafana/otel-lgtm:0.37.0
+    ports:
+      - "127.0.0.1:13000:3000"
+    volumes:
+      - telemetry_data:/data
+volumes:
+  telemetry_data:

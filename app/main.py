@@ -14,6 +14,7 @@ from .db import Base, engine, db_session
 from .schemas import ImportIn, CommitmentIn, ReviewIn, AssignIn, VerifyIn, AIProposalsIn
 from .service import as_utc, audit, evaluate, finding_detail, get_action, get_finding, overview
 from .ai_extract import provider_name, propose
+from .telemetry import setup_telemetry, add_stdout_safe_log, instrument_request
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -22,12 +23,16 @@ ROOT = Path(__file__).resolve().parent.parent
 async def lifespan(app: FastAPI):
     if os.environ.get("SP_MODE", "synthetic_local") != "synthetic_local":
         raise RuntimeError("Production operation is intentionally disabled; this is a local synthetic demo")
+    add_stdout_safe_log()
+    setup_telemetry()
     Base.metadata.create_all(bind=engine)
     yield
 
 
 app = FastAPI(title="SupportPulse AI", version="0.1.0", lifespan=lifespan,
               description="Local synthetic-only testbed; not a production service")
+
+app.middleware("http")(instrument_request)
 
 
 @app.get("/")

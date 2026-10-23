@@ -106,3 +106,9 @@ The new dashboard panel **«Предложения по обещаниям»** a
 **Important:** the default `SP_AI_PROVIDER=rules` is an explicitly labeled **deterministic baseline, not an LLM**. A genuine OpenAI Responses API JSON-Schema adapter exists, but is **not selected in Docker/CI, has not been invoked with a live model, and must not be described as a verified AI capability**. Model output is always validated against immutable source text and due time; on ambiguity, abstain. The workflow remains synthetic-only, and no third-party messages are sent by default.
 
 For exact API sample, safety properties, environment opt-in, and tiny synthetic evaluation see [AI promise extraction spec](docs/AI_PROMISE_EXTRACTION_v0.1.md). The test evidence is not proof of model accuracy, financial recovery, or production readiness.
+
+## Iteration 005 — privacy-preserving OpenTelemetry (opt-in)
+
+The regular demo remains synthetic-only. OpenTelemetry is disabled in normal Docker Compose, but structured scrubbed JSON operation logs and a trace correlation header are available. An **optional** `compose.telemetry.yaml` overlay adds Grafana/Loki/Tempo/Prometheus behind Mac localhost and emits correlated traces, metrics and log events. It **does not modify your existing compose.yaml host-port override or Postgres volume**.
+
+Review the [observability walkthrough and privacy checklist](docs/OBSERVABILITY_v0.1.md) before using the optional overlay. **Do not count course Observability 2/2 until the 3 signals are verified in the actual Grafana UI.** No production-grade hosted monitoring or impact alert exists yet.
