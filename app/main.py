@@ -11,8 +11,9 @@ from sqlalchemy.orm import Session
 from . import models as m
 from .auth import DEMO_TENANT, Principal, require_user, supervisor_only
 from .db import Base, engine, db_session
-from .schemas import ImportIn, CommitmentIn, ReviewIn, AssignIn, VerifyIn
+from .schemas import ImportIn, CommitmentIn, ReviewIn, AssignIn, VerifyIn, AIProposalsIn
 from .service import as_utc, audit, evaluate, finding_detail, get_action, get_finding, overview
+from .ai_extract import provider_name, propose
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -98,6 +99,68 @@ def import_events(payload: ImportIn, user: Principal = Depends(require_user), db
     return {"inserted": inserted, "deduplicated": len(payload.events) - inserted,
             "watermark": as_utc(source.watermark).isoformat(), "data_mode": "SYNTHETIC_ONLY"}
 
+
+
+
+@app.post("/api/v1/ai/proposals")
+def ai_promise_proposals(payload: AIProposalsIn, user: Principal = Depends(require_user),
+                         db: Session = Depends(db_session)):
+    """Read-only candidate extraction; only the separate human approval API writes commitments."""
+    supervisor_only(user)
+    provider = provider_name()
+    source = db.scalar(select(m.Source).where(
+        m.Source.id == payload.source_id, m.Source.tenant_id == user.tenant_id))
+    if source is None:
+        raise HTTPException(404, "Source not found")
+    envelope = {
+        "source_id": payload.source_id,
+        "conversation_id": payload.conversation_id,
+        "provider": "RULE_BASELINE_NOT_AI" if provider == "rules" else provider.upper(),
+        "external_model_invoked": provider == "openai",
+        "review_required": True,
+        "data_mode": "SYNTHETIC_ONLY",
+        "proposals": [],
+        "abstentions": [],
+    }
+    if source.health != "HEALTHY" or source.watermark is None:
+        envelope["abstentions"] = [{"reason": "INSUFFICIENT_SOURCE_COVERAGE"}]
+        return envelope
+    events = db.scalars(select(m.SourceEvent).where(
+        m.SourceEvent.tenant_id == user.tenant_id,
+        m.SourceEvent.source_id == source.id,
+        m.SourceEvent.conversation_id == payload.conversation_id,
+        m.SourceEvent.kind == "manager_message"
+    ).order_by(m.SourceEvent.event_time, m.SourceEvent.id).limit(8)).all()
+    for ev in events:
+        item = {"basis_external_id": ev.external_id}
+        if as_utc(ev.event_time) > as_utc(source.watermark):
+            item["reason"] = "EVENT_NOT_COVERED"
+            envelope["abstentions"].append(item)
+            continue
+        if len(ev.message) > 2000:
+            item["reason"] = "MESSAGE_TOO_LONG"
+            envelope["abstentions"].append(item)
+            continue
+        result = propose(ev.message, as_utc(ev.event_time), provider)
+        if result["status"] == "PROPOSED":
+            envelope["proposals"].append({
+                "source_id": source.id,
+                "conversation_id": payload.conversation_id,
+                "basis_external_id": ev.external_id,
+                "actor_id": ev.actor_id,
+                "evidence_quote": result["quote"],
+                "due_at": result["due_at"],
+                "action_type": result["action_type"],
+                "status": "PROPOSED_NOT_APPROVED",
+                "confidence": None,
+                "financial_impact": None,
+            })
+        else:
+            item["reason"] = result["reason"]
+            envelope["abstentions"].append(item)
+    if not events:
+        envelope["abstentions"].append({"reason": "NO_MANAGER_MESSAGES"})
+    return envelope
 
 @app.post("/api/v1/commitments")
 def approve_commitment(payload: CommitmentIn, user: Principal = Depends(require_user), db: Session = Depends(db_session)):
