@@ -1,22 +1,46 @@
-# DataTalks.Club AI Dev Tools Zoomcamp 2026 — Project 2 readiness
+# DataTalks.Club AI Dev Tools Zoomcamp 2026 — Project 2: evidence audit
 
-Reference: https://github.com/DataTalksClub/ai-dev-tools-zoomcamp/blob/main/project/README.md
+**Audited:** 2026-10-23. This document supersedes the original 2026-10-22 pre-deployment estimate.
+**Official criteria:** https://github.com/DataTalksClub/ai-dev-tools-zoomcamp/blob/main/project/README.md
+**Submission:** https://courses.datatalks.club/ai-dev-tools-2026/project/project2
 
-Statuses: `DESIGNED`, `PARTIAL`, `NOT DONE`, `VERIFIED` mean exactly what they say. Current code has **not been submitted** to the course.
+## Provisional rubric scoring
 
-| Criterion | Current honest status | Missing evidence |
-|---|---|---|
-| Problem description | DESIGNED | Buyer confirmation and review-ready English explanation |
-| Product specification + task tracker | PARTIAL | Hosted GitHub Issues and agent-referenced implementation evidence |
-| Agent team specification | DESIGNED | Agent role document drafted; independent execution review unverified |
-| Context management | PARTIAL | AGENTS.md and modular docs present; GitHub tracker/workflow evidence missing |
-| Full-stack app | PARTIAL | FastAPI + vanilla JS + SQLAlchemy; local HTTP health PASS; PostgreSQL Compose and browser E2E not yet verified |
-| Testing | PARTIAL | 14 local API tests PASS (SQLite), CI YAML drafted; PostgreSQL and browser tests still needed |
-| Containerization | PARTIAL | Dockerfile+Compose written; need Docker startup evidence |
-| Deployment | NOT DONE | Public synthetic demo or qualified deployment demo |
-| CI/CD | PARTIAL | CI YAML written; not active until pushed; CD missing |
-| Observability | NOT DONE | Logs/traces/metrics with shared trace id + browsable UI |
-| Alert on real user impact | NOT DONE | Triggering rule and runbook for missing important followups |
-| On-call responder agent | NOT DONE | Bounded alert-activated response with safety demonstration |
+This is an **assistant's evidence-based estimate**, NOT a reviewer-assigned score or course pass. The course requires **10/24 points AND 3 peer reviews**. Actual submission and peer reviews have not been confirmed.
 
-Do not conflate 'github push' with course submission or 'working local demo' with a public production deployment.
+| # | Criterion (maximum) | Provisional | Concrete evidence / gap |
+|---|---|---:|---|
+| 1 | Problem Description (2) | **2** | [README](../README.md) documents broken customer promises, expected lifecycle, limitations and synthetic scope |
+| 2 | Product Specification (2) | **2** | [Scenario spec](SCENARIO_SPEC_v0.2.md), public GitHub issues with acceptance checks, PRs linked to issues |
+| 3 | Agent Team Specification (2) | **2** | [Agent team](AGENT_TEAM.md) gives roles, process, human owner and escalation; it describes **process**, not autonomous agent execution |
+| 4 | Context Management (2) | **2** | [AGENTS.md](../AGENTS.md) references modular spec/process/research documents |
+| 5 | Application (2) | **2** | Local Mac browser owner walkthrough, FastAPI, PostgreSQL persistent Docker; verified case 1 & 2 |
+| 6 | Testing (2) | **2** | Automated Python unit/API and isolated PostgreSQL integration and 3 Chromium E2E tests in [CI for code 0f7fd10](https://github.com/butomaya12-wq/supportpulse-ai/actions/runs/39967126823), **4/4 jobs PASS** |
+| 7 | Containerization (2) | **2** | [compose.yaml](../compose.yaml) starts DB + web, owner reported both healthy locally, browser at `127.0.0.1:18080` (Mac-local port override) |
+| 8 | Deployment (2) | **0** | No public reachable deployment of SupportPulse AI; localhost demo alone is not a verified hosted deployment |
+| 9 | CI/CD (3) | **1** | GitHub Actions runs tests on PRs; **CD / dev + prod release / rollback are not implemented** |
+| 10 | Observability (2) | **0** | No demonstrated correlated journey tracing, structured request logs, persisted telemetry UI; do not award based on ordinary uvicorn output |
+| 11 | Alerting on User Impact (1) | **0** | No user-impact alert rule + demonstrated firing |
+| 12 | On-Call Agent (2) | **0** | No alert-triggered bounded responder with demonstrated safe fix |
+
+**Total provisional: 15/24**, subject to human peer-review scoring and evidence completeness.
+
+**Course completion:** **NOT COMPLETE**, even though the provisional estimate exceeds the 10-point numerical threshold. It additionally requires **3 actual peer reviews, a submitted public repo and exact commit, project work hours**, and review outcome. Consult the course page for current deadlines.
+
+## Highest-priority gaps for full rubric, not just passing score
+
+1. Deploy a **clearly labeled synthetic-only** app to an accessible demo environment with suitably isolated credentials/storage; provide URL or a clear deployment demonstration. Do not expose demo bearer tokens publicly with real data.
+2. Add safe staged release process (CI -> development CD -> human-gated release, rollback with smoke check); database migration and rollback discipline.
+3. Instrument a **specific user journey** end-to-end (e.g. import -> candidate -> supervisor confirmation -> correction), with shared trace/request correlation, structured logs, metrics/traces and a queryable telemetry UI; never send source text, access tokens or customer identifiers to telemetry.
+4. Implement reproducible **user-impact alert** on a genuine signal (e.g. failing human review workflow or stuck action), not only container CPU; include trigger proof and runbook.
+5. Build a **bounded alert-driven on-call responder** in a disposable synthetic environment with an allowlisted safe fix, verification and explicit human approval for risky actions; demonstrate the entire alert -> agent -> fix cycle. Distinct from business-logic AI proposal generation.
+6. Update English README/docs/architecture/traceability so reviewer sees **actual 2026-10-23 evidence**, not stale `NOT IMPLEMENTED` statements from iteration 001. Provide a single reproduction guide.
+7. Submit [Project 2](https://courses.datatalks.club/ai-dev-tools-2026/project/project2) with the **public repository URL, immutable commit SHA and credible net project hours**, and complete **3 peer reviews**.
+
+## Honest non-course constraints
+
+The current app intentionally refuses production mode and has no authorized real customer integrations, real user privacy/consent program, production authentication, deployment migration strategy, real financial attribution or validated LLM extraction quality. **Full course points do not imply production readiness.** External OpenAI model adapter is implemented but not verified with live model calls. Business outcomes and recovered revenue remain UNKNOWN.
+
+## Time account
+
+See [DEVELOPMENT_TIMELOG.md](DEVELOPMENT_TIMELOG.md). On 2026-10-23 at 17:49:19 UTC, elapsed calendar time from the provisional engineering start was **21 h 59 min 39 sec**; this is **not hours worked**.
