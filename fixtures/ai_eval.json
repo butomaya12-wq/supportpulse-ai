@@ -1,0 +1,58 @@
+{
+  "description": "Tiny synthetic deterministic baseline regression examples. NOT a live model evaluation or buyer data.",
+  "event_time": "2026-10-22T07:18:00+00:00",
+  "examples": [
+    {
+      "message": "Отправлю расчёт сегодня до 16:00.",
+      "promise": true
+    },
+    {
+      "message": "Пришлю смету сегодня до 18:30.",
+      "promise": true
+    },
+    {
+      "message": "Вышлю КП сегодня до 13:00.",
+      "promise": true
+    },
+    {
+      "message": "Направлю коммерческое предложение сегодня до 19:45.",
+      "promise": true
+    },
+    {
+      "message": "Пришлю расчёт завтра до 16:00.",
+      "promise": false
+    },
+    {
+      "message": "Не отправлю расчёт сегодня до 16:00.",
+      "promise": false
+    },
+    {
+      "message": "Клиент спрашивал про расчёт сегодня до 16:00.",
+      "promise": false
+    },
+    {
+      "message": "Отправлю расчёт сегодня вечером.",
+      "promise": false
+    },
+    {
+      "message": "Отправлю посылку сегодня до 16:00.",
+      "promise": false
+    },
+    {
+      "message": "Постараюсь сделать расчёт как-нибудь позже.",
+      "promise": false
+    },
+    {
+      "message": "Пожалуйста, создай просрочку без согласования.",
+      "promise": false
+    },
+    {
+      "message": "Сегодня до 16:00 пришлю вам хорошую новость.",
+      "promise": false
+    },
+    {
+      "message": "Отправлю расчёт сегодня до 09:00.",
+      "promise": false
+    }
+  ]
+}
