@@ -14,13 +14,6 @@ TOKEN = os.environ.get("E2E_SUPERVISOR_TOKEN", "isolated-e2e-supervisor")
 ARTIFACTS = Path("artifacts/browser-e2e")
 
 
-@pytest.hookimpl(hookwrapper=True)
-def pytest_runtest_makereport(item, call):
-    outcome = yield
-    result = outcome.get_result()
-    setattr(item, "rep_" + result.when, result)
-
-
 @pytest.fixture(autouse=True)
 def isolated_database_guard():
     """Make accidental runs against the owner's persistent local database impossible."""
