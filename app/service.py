@@ -136,9 +136,12 @@ def overview(db: Session, tenant: str) -> dict:
     verified = db.scalar(select(func.count()).select_from(m.CorrectiveAction).where(
         m.CorrectiveAction.tenant_id == tenant, m.CorrectiveAction.state == "VERIFIED")) or 0
     total_actions = db.scalar(select(func.count()).select_from(m.CorrectiveAction).where(m.CorrectiveAction.tenant_id == tenant)) or 0
+    human_confirmed = db.scalar(select(func.count()).select_from(m.Finding).where(
+        m.Finding.tenant_id == tenant, m.Finding.reviewed_by.is_not(None),
+        m.Finding.state.in_(("CONFIRMED_OVERDUE", "FULFILLED_LATE", "CORRECTED_LATE")))) or 0
     return {"tenant": tenant, "data_mode": "SYNTHETIC_ONLY", "impact_rub": None,
             "counts": {"review_backlog": states.get("CANDIDATE_OVERDUE", 0) + states.get("INSUFFICIENT_DATA", 0),
-                       "confirmed_overdue": states.get("CONFIRMED_OVERDUE", 0) + states.get("CORRECTED_LATE", 0),
+                       "confirmed_overdue": human_confirmed,
                        "unknown": states.get("INSUFFICIENT_DATA", 0),
                        "actions_verified": verified, "actions_total": total_actions},
             "on_time": {"value": round(on_time / denom, 4) if denom else None,
