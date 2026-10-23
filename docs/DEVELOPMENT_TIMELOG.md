@@ -52,3 +52,13 @@ Proposed table for future sessions:
 - **Deliverables:** PR #13, correlated request tracing/logging/metrics, 34 Python tests, 3 browser E2E, Docker CI, optional Grafana overlay.
 - **Human active work time:** **UNKNOWN**; no user stopwatch / confirmed break report.
 - **Next milestone:** actual Grafana UI proof and a new timestamped owner-local review session.
+
+
+## Iteration 006 — user-impact alert
+
+- **Scope:** Grafana-managed Prometheus alert for 5xx on critical `GET /api/v1/overview`, optional synthetic-only fault probe, and Normal → Firing → Normal operator runbook.
+- **Merge timestamp:** 2026-10-23 **21:13:57 UTC** (2026-10-24 02:13:57 UTC+05); commit `fe71f0a9d55d532f63a30fbb85f9c564abcd9f92`. **Independent GitHub evidence.**
+- **Post-merge CI:** [run 40025237221](https://github.com/butomaya12-wq/supportpulse-ai/actions/runs/40025237221), 4/4 green including 39 Python tests, PostgreSQL, three Chromium E2E and Docker.
+- **Session wall-time window:** user requested start of this iteration at about **2026-10-24 02:06 UTC+05** (rounded, from conversation timestamp); current checkpoint **02:15:24 UTC+05** from user-local time service. Approx. **9 minutes** of elapsed elapsed wall-clock since this marker. This is not measured active human work time; do not submit it as worked hours.
+- **User-local runtime Grafana alert proof:** **PENDING** (configuration and CI done, rule firing not yet observed). Completion timestamp not fixed until actual UI proof.
+- **Active hands-on work hours:** **UNKNOWN**, pending explicit non-overlapping work sessions and break confirmation. Do not add assistant/tool runtime and human work hours together.
