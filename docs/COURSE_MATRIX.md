@@ -1,6 +1,6 @@
 # DataTalks.Club AI Dev Tools Zoomcamp 2026 — Project 2: evidence audit
 
-**Audited:** 2026-10-23. This document supersedes the original 2026-10-22 pre-deployment estimate.
+**Audited:** 2026-10-24. This document supersedes the original 2026-10-22 pre-deployment estimate.
 **Official criteria:** https://github.com/DataTalksClub/ai-dev-tools-zoomcamp/blob/main/project/README.md
 **Submission:** https://courses.datatalks.club/ai-dev-tools-2026/project/project2
 
@@ -19,11 +19,11 @@ This is an **assistant's evidence-based estimate**, NOT a reviewer-assigned scor
 | 7 | Containerization (2) | **2** | [compose.yaml](../compose.yaml) starts DB + web, owner reported both healthy locally, browser at `127.0.0.1:18080` (Mac-local port override) |
 | 8 | Deployment (2) | **0** | No public reachable deployment of SupportPulse AI; localhost demo alone is not a verified hosted deployment |
 | 9 | CI/CD (3) | **1** | GitHub Actions runs tests on PRs; **CD / dev + prod release / rollback are not implemented** |
-| 10 | Observability (2) | **0** | No demonstrated correlated journey tracing, structured request logs, persisted telemetry UI; do not award based on ordinary uvicorn output |
+| 10 | Observability (2) | **2 (provisional)** | Owner locally verified a key dashboard request: Tempo trace `GET /api/v1/overview` HTTP 200 with trace ID `2c250120628f398504f235b20b875b0e`, Loki `http.completed` with **exactly the same** ID, and Prometheus `supportpulse_http_requests_total` series. CI tests safe structured instrumentation. **Core multi-request business workflow still needs separate evidence; peer reviewer decides**. See [Issue #12](https://github.com/butomaya12-wq/supportpulse-ai/issues/12). |
 | 11 | Alerting on User Impact (1) | **0** | No user-impact alert rule + demonstrated firing |
 | 12 | On-Call Agent (2) | **0** | No alert-triggered bounded responder with demonstrated safe fix |
 
-**Total provisional: 15/24**, subject to human peer-review scoring and evidence completeness.
+**Total provisional: 17/24**, subject to human peer-review scoring and evidence completeness.
 
 **Course completion:** **NOT COMPLETE**, even though the provisional estimate exceeds the 10-point numerical threshold. It additionally requires **3 actual peer reviews, a submitted public repo and exact commit, project work hours**, and review outcome. Consult the course page for current deadlines.
 
@@ -31,7 +31,7 @@ This is an **assistant's evidence-based estimate**, NOT a reviewer-assigned scor
 
 1. Deploy a **clearly labeled synthetic-only** app to an accessible demo environment with suitably isolated credentials/storage; provide URL or a clear deployment demonstration. Do not expose demo bearer tokens publicly with real data.
 2. Add safe staged release process (CI -> development CD -> human-gated release, rollback with smoke check); database migration and rollback discipline.
-3. Instrument a **specific user journey** end-to-end (e.g. import -> candidate -> supervisor confirmation -> correction), with shared trace/request correlation, structured logs, metrics/traces and a queryable telemetry UI; never send source text, access tokens or customer identifiers to telemetry.
+3. **Extend verified dashboard-level observability to the entire corrective workflow** (import -> candidate -> supervisor confirmation -> correction), documenting each request trace and audit transition. The currently verified Tempo/Loki/Prometheus proof covers one overview request only, not one continuous cross-request trace.
 4. Implement reproducible **user-impact alert** on a genuine signal (e.g. failing human review workflow or stuck action), not only container CPU; include trigger proof and runbook.
 5. Build a **bounded alert-driven on-call responder** in a disposable synthetic environment with an allowlisted safe fix, verification and explicit human approval for risky actions; demonstrate the entire alert -> agent -> fix cycle. Distinct from business-logic AI proposal generation.
 6. Update English README/docs/architecture/traceability so reviewer sees **actual 2026-10-23 evidence**, not stale `NOT IMPLEMENTED` statements from iteration 001. Provide a single reproduction guide.
