@@ -41,6 +41,16 @@
           </section>
           <section class="panel" id="sources"><div class="panel-heading"><div><div class="eyebrow">DATA INTEGRITY</div><h2>Качество источников</h2></div><span class="label green">TRACEABLE</span></div><div id="sourceList" class="source-items"><div class="empty">Источники ещё не загружены</div></div><div class="integrity-note"><span>ⓘ</span> Если данных недостаточно, система не объявляет менеджера виновным.</div></section>
         </div>
+        <section class="panel" id="ai-analysis">
+          <div class="panel-heading"><div><div class="eyebrow">EXPLAINABLE EXTRACTION</div><h2>Предложения по обещаниям</h2></div><span class="label">HUMAN APPROVAL</span></div>
+          <p class="ai-note">Анализирует сообщения из синтетического источника и предлагает точный срок с цитатой. Ничего не утверждает автоматически. По умолчанию работает воспроизводимый <b>rule-based baseline, не языковая модель</b>; внешний AI включается отдельно.</p>
+          <div class="ai-inputs">
+            <label>Источник <input id="aiSource" value="demo-instagram" maxlength="80" autocomplete="off" /></label>
+            <label>Обращение <input id="aiConversation" value="demo-lead-001" maxlength="100" autocomplete="off" /></label>
+            <button class="button secondary" id="analyze">Извлечь обещание →</button>
+          </div>
+          <div id="aiResults" class="ai-results" aria-live="polite">Сначала подключитесь к локальной демонстрации и загрузите синтетический пример.</div>
+        </section>
         <section class="panel cases" id="cases"><div class="panel-heading"><div><div class="eyebrow">ACTION QUEUE</div><h2>Кейсы и доказательства</h2></div><button id="refresh" class="button outline">↻ Обновить</button></div><div id="casesList"><div class="empty big">Сначала подключитесь и загрузите синтетический пример</div></div></section>
         <section class="panel detail hidden" id="detailPanel"><div class="panel-heading"><div><div class="eyebrow">EVIDENCE VIEW</div><h2 id="detailTitle">Карточка кейса</h2></div><button id="closeDetail" class="button outline">Закрыть ✕</button></div><div id="detailContent"></div><div id="detailActions" class="detail-actions"></div></section>
         <footer><span>© Maya AI Systems · SupportPulse AI</span><span>Синтетические данные · финансовый эффект неизвестен · production-ready: NO</span></footer>

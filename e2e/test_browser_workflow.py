@@ -257,3 +257,47 @@ def test_browser_wrong_actor_and_bounced_proof_remain_blocked(page):
         item["action"] == "ACTION_CLOSED" and item["target"] == f"finding:{case_id}"
         for item in api_get(page, "audit")["data"]
     )
+
+
+def test_browser_rule_baseline_proposal_requires_manual_approval(page):
+    """Synthetic candidate extraction must not create a commitment before human consent."""
+    source = "e2e-ai-promise-004"
+    conversation = "e2e-ai-lead-004"
+    api_post(page, "imports", {
+        "source_id": source, "channel": "instagram-synthetic",
+        "watermark": "2026-10-22T14:00:00Z", "healthy": True,
+        "events": [
+            {"external_id": "ai-customer-004", "event_time": "2026-10-22T07:05:00Z",
+             "kind": "customer_message", "conversation_id": conversation,
+             "actor_id": "synthetic-customer", "message": "Пришлите, пожалуйста, расчёт шкафа."},
+            {"external_id": "ai-manager-004", "event_time": "2026-10-22T07:18:00Z",
+             "kind": "manager_message", "conversation_id": conversation,
+             "actor_id": "demo-manager-001", "message": "Отправлю расчёт сегодня до 16:00."},
+        ],
+    })
+    connect(page)
+    assert not any(x["commitment"]["conversation_id"] == conversation
+                   for x in api_get(page, "findings")["data"])
+    page.locator("#aiSource").fill(source)
+    page.locator("#aiConversation").fill(conversation)
+    page.locator("#analyze").click()
+    expect(page.locator("#aiResults")).to_contain_text("НЕ языковая модель")
+    expect(page.locator("#aiResults")).to_contain_text("ai-manager-004")
+    expect(page.locator("#aiResults")).to_contain_text("Отправлю расчёт сегодня до 16:00.")
+    approve = page.locator('[data-ai-approve="0"]')
+    expect(approve).to_be_visible()
+    page.once("dialog", lambda dialog: dialog.dismiss())
+    approve.click()
+    assert not any(x["commitment"]["conversation_id"] == conversation
+                   for x in api_get(page, "findings")["data"])
+    page.once("dialog", lambda dialog: dialog.accept())
+    approve.click()
+    expect(page.locator("#message")).to_contain_text("Обещание одобрено человеком")
+    expect(page.locator("#casesList")).to_contain_text(conversation)
+    item = next(x for x in api_get(page, "findings")["data"]
+                if x["commitment"]["conversation_id"] == conversation)
+    assert item["state"] == "CANDIDATE_OVERDUE"
+    assert item["commitment"]["basis"]["external_id"] == "ai-manager-004"
+    assert any(x["action"] == "HUMAN_APPROVED"
+               and x["target"] == f"commitment:{item['commitment']['id']}"
+               for x in api_get(page, "audit")["data"])
