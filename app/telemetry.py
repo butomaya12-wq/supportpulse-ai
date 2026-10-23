@@ -6,6 +6,7 @@ Disabled by default to preserve previous local application behavior.
 """
 import json
 import logging
+from contextvars import ContextVar
 import os
 import re
 import sys
@@ -40,6 +41,8 @@ _counter = None
 _duration = None
 _blocked = None
 _transition_counter = None
+# Starlette/AnyIO propagates this context into sync endpoint worker threads.
+_request_trace_id: ContextVar[str | None] = ContextVar("sp_request_trace_id", default=None)
 
 
 class RedactedJsonFormatter(logging.Formatter):
@@ -104,7 +107,9 @@ def _route_template(request: Request) -> str:
 
 def _trace_id() -> str:
     context = trace.get_current_span().get_span_context()
-    return f"{context.trace_id:032x}" if context.is_valid else uuid4().hex
+    if context.is_valid:
+        return f"{context.trace_id:032x}"
+    return _request_trace_id.get() or uuid4().hex
 
 
 async def instrument_request(request: Request, call_next):
@@ -113,6 +118,9 @@ async def instrument_request(request: Request, call_next):
     method = request.method if request.method in _SAFE_METHODS else "OTHER"
     start = time.perf_counter()
     with tracer.start_as_current_span("http.request") as span:
+        # Keep one stable ID even with OTLP disabled/no-op tracer. This also
+        # propagates safely across FastAPI worker-thread boundaries.
+        token = _request_trace_id.set(_trace_id())
         status = 500
         try:
             response = await call_next(request)
@@ -149,6 +157,7 @@ async def instrument_request(request: Request, call_next):
             })
             if status != 500 and "response" in locals():
                 response.headers["X-Trace-Id"] = current_trace
+            _request_trace_id.reset(token)
 
 
 def mark_audit_queued(action: str) -> None:
