@@ -112,3 +112,9 @@ For exact API sample, safety properties, environment opt-in, and tiny synthetic 
 The regular demo remains synthetic-only. OpenTelemetry is disabled in normal Docker Compose, but structured scrubbed JSON operation logs and a trace correlation header are available. An **optional** `compose.telemetry.yaml` overlay adds Grafana/Loki/Tempo/Prometheus behind Mac localhost and emits correlated traces, metrics and log events. It **does not modify your existing compose.yaml host-port override or Postgres volume**.
 
 Review the [observability walkthrough and privacy checklist](docs/OBSERVABILITY_v0.1.md) before using the optional overlay. **Do not count course Observability 2/2 until the 3 signals are verified in the actual Grafana UI.** No production-grade hosted monitoring or impact alert exists yet.
+
+## Iteration 006 — synthetic user-impact alert exercise
+
+An optional Grafana-managed alert monitors HTTP **5xx** on the supervisor's critical `GET /api/v1/overview` endpoint. A doubly opt-in, supervisor-authenticated synthetic request can generate 503 **for that request only** to prove the alert fires; other viewers and your persistent Postgres data stay unchanged. Ordinary Compose and telemetry Compose do not enable the drill.
+
+Review [safe Grafana alert trigger and recovery runbook](docs/ALERT_DRILL_RUNBOOK.md). File provisioned rule lives in [ops/grafana/alerting/overview-5xx.yaml](ops/grafana/alerting/overview-5xx.yaml) and optional third overlay is `compose.alerts.yaml`. This is a **simulated local incident**, not proof of a real customer outage, external notification or on-call agent. **Do not award the course alerting point until an owner screenshot confirms Normal → Firing → Normal.**
