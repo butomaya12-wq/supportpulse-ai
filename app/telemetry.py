@@ -7,6 +7,7 @@ Disabled by default to preserve previous local application behavior.
 import json
 import logging
 from contextvars import ContextVar
+from datetime import datetime, timezone
 import os
 import re
 import sys
@@ -52,6 +53,7 @@ class RedactedJsonFormatter(logging.Formatter):
         if not isinstance(trace_id, str) or not re.fullmatch(r"[0-9a-f]{32}", trace_id):
             trace_id = "none"
         return json.dumps({
+            "timestamp_utc": datetime.fromtimestamp(record.created, timezone.utc).isoformat(),
             "event": str(record.msg) if record.msg in {"http.completed", "business.audit_queued"} else "ops.event",
             "trace_id": trace_id,
             "route": getattr(record, "route", "none"),
