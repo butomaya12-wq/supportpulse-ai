@@ -46,7 +46,14 @@ def test_exact_opt_in_returns_observable_503_but_no_database_mutation(ctx, super
         def add(self, amount, attrs):
             self.counts.append((amount, attrs))
     stub = MeterStub()
+    class HistogramStub:
+        def __init__(self):
+            self.samples = []
+        def record(self, amount, attrs):
+            self.samples.append((amount, attrs))
+    histogram = HistogramStub()
     monkeypatch.setattr(telemetry, "_counter", stub)
+    monkeypatch.setattr(telemetry, "_duration", histogram)
     r = c.get("/api/v1/overview", headers={**supervisor, **DRILL})
     assert r.status_code == 503
     assert "SYNTHETIC_ONLY" in r.json()["detail"]
@@ -56,6 +63,7 @@ def test_exact_opt_in_returns_observable_503_but_no_database_mutation(ctx, super
         "http.request.method": "GET",
         "http.response.status_class": "5xx",
     }) in stub.counts
+    assert histogram.samples and histogram.samples[0][0] >= 0
     assert c.get("/api/v1/overview", headers=supervisor).status_code == 200
     with Session() as db:
         for model in [Audit, Source, Commitment, Finding, CorrectiveAction]:
