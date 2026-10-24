@@ -5,6 +5,7 @@ single named/allowlisted synthetic alert is accepted. No LLM, shell, restart, SQ
 mutation, unbounded URL fetch, deployment or customer contact is possible.
 """
 import hashlib
+import json
 import os
 import re
 import sqlite3
@@ -46,6 +47,11 @@ def init_store() -> None:
             verified_recovery INTEGER NOT NULL,
             UNIQUE(fingerprint_hash, starts_at, alert_status)
         )""")
+        columns = {row[1] for row in conn.execute("PRAGMA table_info(agent_events)")}
+        if "post_repair_http" not in columns:
+            conn.execute("ALTER TABLE agent_events ADD COLUMN post_repair_http INTEGER NOT NULL DEFAULT 0")
+        if "repair_revision" not in columns:
+            conn.execute("ALTER TABLE agent_events ADD COLUMN repair_revision INTEGER")
         conn.commit()
 
 
@@ -117,6 +123,62 @@ def diagnose() -> tuple[int, int]:
     return _http_probe("/health"), _http_probe("/api/v1/overview", authenticated=True)
 
 
+
+def _repair_header(intent: str) -> dict:
+    secret = os.environ.get("SP_REPAIR_TOKEN", "")
+    if (os.environ.get("SP_MODE") != "synthetic_local"
+            or os.environ.get("SP_REPAIR_DRILL_ENABLED") != "1"
+            or len(secret) < 32):
+        raise RuntimeError("SYNTHETIC_REPAIR_NOT_CONFIGURED")
+    return {
+        "Authorization": "Bearer " + secret,
+        "X-SupportPulse-Repair-Drill": intent,
+    }
+
+
+def _repair_request(path: str, intent: str, method: str = "GET") -> dict | None:
+    headers = _repair_header(intent)
+    if path != "/api/v1/demo/repair-drill/state" and not (
+        method == "POST" and re.fullmatch(
+            r"/api/v1/demo/repair-drill/repair\\?expected_revision=[1-9][0-9]{0,8}", path)):
+        return None
+    try:
+        req = Request(_target_url(path), headers=headers, method=method,
+                      data=b"" if method == "POST" else None)
+        with urlopen(req, timeout=3) as response:
+            if response.status != 200:
+                return None
+            return json.loads(response.read(2048))
+    except (HTTPError, OSError, ValueError):
+        return None
+
+
+def attempt_safe_repair() -> tuple[str, int, int | None]:
+    """Only fix a proven synthetic latch; never repair an arbitrary error."""
+    try:
+        evidence = _repair_request("/api/v1/demo/repair-drill/state", "inspect")
+    except RuntimeError:
+        return "NOT_AN_ENABLED_SYNTHETIC_DRILL", 0, None
+    if not isinstance(evidence, dict) or evidence.get("data_mode") != "SYNTHETIC_ONLY":
+        return "REPAIR_EVIDENCE_MISSING", 0, None
+    revision = evidence.get("revision")
+    if evidence.get("state") != "BROKEN" or type(revision) is not int or not 1 <= revision <= 999999999:
+        return "REPAIR_NOT_ALLOWLISTED", 0, None
+    response = _repair_request(
+        f"/api/v1/demo/repair-drill/repair?expected_revision={revision}",
+        "repair", "POST")
+    if not isinstance(response, dict) or response.get("repair_applied") is not True:
+        return "REPAIR_REJECTED", 0, revision
+    if response.get("state") != "READY" or response.get("revision") != revision:
+        return "REPAIR_ACK_MISMATCH", 0, revision
+    state_after = _repair_request("/api/v1/demo/repair-drill/state", "inspect")
+    post_http = _http_probe("/api/v1/overview", authenticated=True)
+    if (isinstance(state_after, dict) and state_after.get("state") == "READY"
+            and state_after.get("revision") == revision and post_http == 200):
+        return "AUTO_REPAIRED_SYNTHETIC", post_http, revision
+    return "REPAIR_UNVERIFIED", post_http, revision
+
+
 def _outcome(status: str, health: int, overview: int) -> tuple[str, bool]:
     if status == "resolved" and health == 200 and overview == 200:
         return "VERIFIED_RESOLVED", True
@@ -146,16 +208,30 @@ def consume(payload: dict) -> dict:
                         "verified_recovery": bool(existing[2])}
             health, overview = diagnose()
             result, verified = _outcome(status, health, overview)
+            action = "TWO_READ_ONLY_PROBES"
+            post_http = 0
+            revision = None
+            if status == "firing" and health == 200 and overview == 503:
+                attempt_result, post_http, revision = attempt_safe_repair()
+                if attempt_result == "AUTO_REPAIRED_SYNTHETIC":
+                    result = "AUTO_REPAIRED_SYNTHETIC"
+                    action = "REPAIR_SYNTHETIC_OVERVIEW_GATE"
+                    verified = False
+                elif attempt_result not in {"NOT_AN_ENABLED_SYNTHETIC_DRILL", "REPAIR_NOT_ALLOWLISTED"}:
+                    result = attempt_result
+                    action = "REPAIR_ATTEMPT_FAILED"
             cursor = db.execute(
                 "INSERT INTO agent_events "
                 "(received_utc,fingerprint_hash,starts_at,alert_status,outcome,action,"
-                "health_http,overview_http,verified_recovery) VALUES(?,?,?,?,?,?,?,?,?)",
+                "health_http,overview_http,verified_recovery,post_repair_http,repair_revision)"
+                " VALUES(?,?,?,?,?,?,?,?,?,?,?)",
                 (datetime.now(timezone.utc).isoformat(), key, start, status,
-                 result, "TWO_READ_ONLY_PROBES", health, overview, int(verified)),
+                 result, action, health, overview, int(verified), post_http, revision),
             )
             db.commit()
             return {"accepted": True, "duplicate": False, "event_id": cursor.lastrowid,
-                    "outcome": result, "action": "TWO_READ_ONLY_PROBES",
+                    "outcome": result, "action": action,
+                    "post_repair_http": post_http, "repair_revision": revision,
                     "verified_recovery": verified}
 
 
@@ -164,11 +240,12 @@ def events(limit: int = 20) -> list[dict]:
     with sqlite3.connect(db_path(), timeout=5) as db:
         rows = db.execute(
             "SELECT id, received_utc, alert_status, outcome, action, "
-            "health_http, overview_http, verified_recovery "
+            "health_http, overview_http, verified_recovery, post_repair_http, repair_revision "
             "FROM agent_events ORDER BY id DESC LIMIT ?", (limit,),
         ).fetchall()
     return [
         dict(zip(("id", "received_utc", "alert_status", "outcome", "action",
-                  "health_http", "overview_http", "verified_recovery"), row))
+                  "health_http", "overview_http", "verified_recovery",
+                  "post_repair_http", "repair_revision"), row))
         for row in rows
     ]
