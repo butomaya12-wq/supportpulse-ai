@@ -1,0 +1,32 @@
+name: Public reviewer demo HTTPS smoke
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-preview-https-smoke:
+    if: github.repository == 'butomaya12-wq/supportpulse-ai'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Confirm actual Render public HTTPS page and immutable synthetic bundle
+        env:
+          BASE: https://supportpulse-ai-review-demo.onrender.com
+        run: |
+          set -euo pipefail
+          # Render builds can finish after the GitHub push starts.
+          for attempt in $(seq 1 20); do
+            if curl -fsSL --max-time 15 "$BASE/" -o /tmp/supportpulse-preview.html \
+                && curl -fsSL --max-time 15 "$BASE/cases.json" -o /tmp/supportpulse-cases.json \
+                && grep -Fq 'SupportPulse AI' /tmp/supportpulse-preview.html \
+                && python3 -c 'import json; d=json.load(open("/tmp/supportpulse-cases.json")); assert d["mode"] == "SYNTHETIC_STATIC_PREVIEW"; assert len(d["cases"]) == 2; assert all(len(c["events"]) == 3 for c in d["cases"])'; then
+              echo "PASS: public HTTPS static site serves original SupportPulse layout and exactly 2 synthetic evidence cases."
+              exit 0
+            fi
+            echo "Render publish not yet reachable from GitHub runner, retry $attempt/20"
+            sleep 12
+          done
+          echo "FAIL: public URL or synthetic evidence not externally accessible."
+          exit 1
