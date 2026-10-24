@@ -72,3 +72,12 @@ Proposed table for future sessions:
 - **Deliverables:** guarded Grafana contact point, local webhook receiver, strict alert scope, read-only diagnostics, replay-safe private SQLite audit, synthetic-only Compose overlay, 56 Python tests, 3 Chromium E2E; post-merge main CI 4/4 PASS.
 - **Local Grafana-to-webhook proof:** **PENDING**; does not count as a completed live on-call operation.
 - **Human net working hours:** **UNKNOWN**. Tool execution is not necessarily owner hands-on time. Do not add this to course worked hours without user confirmation.
+
+
+### Iteration 007 runtime evidence: real Grafana webhook
+
+- **2026-10-24 15:24:51 UTC**: local oncall audit received actual Grafana `firing` event; result `ALERT_ACTIVE_PROBE_HEALTHY`; both read-only health/overview requests HTTP 200; recovery **not** claimed.
+- **2026-10-24 15:27:50 UTC**: Grafana delivered `resolved`; agent performed both read-only probes (200/200), persisted `VERIFIED_RESOLVED` in separate oncall SQLite audit.
+- **Verification:** owner retrieved event ledger via authenticated localhost `GET /events`, response HTTP 200. Synthetic-only; no customer data or autonomous repair.
+- These event timestamps measure a **2 min 59 sec automated alert lifecycle**, NOT the total project duration, net human work hours, or time the assistant was actively coding. Those remain separate.
+- **Course rubric:** on-call 0/2 pending actual safe repair. No course submission claimed.
