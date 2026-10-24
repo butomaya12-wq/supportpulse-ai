@@ -159,5 +159,5 @@ def test_repair_overlay_is_optional_and_secret_not_literal():
     for service in ("web", "oncall"):
         env = overlay["services"][service]["environment"]
         assert env["SP_REPAIR_DRILL_ENABLED"] == "1"
-        assert "SP_ONCALL_WEBHOOK_TOKEN:?" in env["SP_REPAIR_TOKEN"]
+        assert "SP_REPAIR_TOKEN:?" in env["SP_REPAIR_TOKEN"]
     assert "db" not in overlay["services"]
