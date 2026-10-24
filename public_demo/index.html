@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="color-scheme" content="dark"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'; frame-ancestors 'none'"/>
+<meta name="referrer" content="no-referrer"/>
+<title>SupportPulse AI · Публичная демонстрация</title>
+<link href="./style.css" rel="stylesheet"/><link href="./preview.css" rel="stylesheet"/>
+<script src="./preview.js" defer></script>
+</head>
+<body>
+<div class="app-shell">
+ <aside class="sidebar">
+   <div class="identity"><span class="logo">◈</span><div><strong>SupportPulse<span class="ai"> AI</span></strong><small>OPERATIONS INTELLIGENCE</small></div></div>
+   <div class="company"><span class="company-icon">DS</span><div><b>Demo Studio</b><small>Public • synthetic snapshot</small></div><span class="company-dot">●</span></div>
+   <div class="nav-title">READ-ONLY SHOWCASE</div>
+   <nav aria-label="Навигация">
+     <a href="#overview" class="active">▦ <span>Обзор</span></a>
+     <a href="#cases">◉ <span>Кейсы и доказательства</span></a>
+     <a href="#workflow">◷ <span>Логика контроля</span></a>
+     <a href="#safety">⬡ <span>Границы демо</span></a>
+   </nav>
+   <div class="side-bottom"><span class="lock">⬡</span><p><strong>100% synthetic · read only</strong><br/>Нет API, клиентских данных, токенов и операций записи.</p></div>
+ </aside>
+ <main><header class="topbar"><div><span class="breadcrumb">SupportPulse AI</span><span class="divider">/</span><strong>Демонстрация для проверяющих</strong></div><div class="topright"><span class="live-dot"></span> STATIC • READ ONLY</div></header>
+ <div class="content" id="overview">
+   <div class="header-row"><div><div class="eyebrow">DECISION INTELLIGENCE <span class="eyebrow-line"></span> EVIDENCE-FIRST</div><h1>Обещания под контролем.<br/><span>Решения с доказательствами.</span></h1><p>Один пример показывает путь от обещания менеджера до просрочки и подтверждённой отправки расчёта. Данные синтетические; экономический эффект неизвестен.</p></div><div class="date-note"><span>●</span><div>Режим<br/><b>Публичный просмотр</b></div></div></div>
+   <section class="notice" id="safety"><strong>Важное разграничение:</strong> это <b>публичная интерактивная визуализация</b> реальных сценариев тестирования SupportPulse AI, а не работающая облачная версия PostgreSQL/API. Все взаимодействия происходят только в браузере; статусы и числа не обновляются из CRM. <a href="https://github.com/butomaya12-wq/supportpulse-ai" target="_blank" rel="noopener noreferrer">Исходный код и локальный backend →</a></section>
+   <div class="kpis" aria-label="Сводка примера">
+     <div class="kpi"><div class="kpi-head">СИНТЕТИЧЕСКИЕ КЕЙСЫ <span>▤</span></div><div class="kpi-value">2</div><div class="kpi-caption">Никаких реальных клиентов</div></div>
+     <div class="kpi"><div class="kpi-head">ПРОСРОЧЕННЫЕ ОБЕЩАНИЯ <span>↗</span></div><div class="kpi-value">2</div><div class="kpi-caption">Проверенные человеком в локальном тесте</div></div>
+     <div class="kpi"><div class="kpi-head">ИСПРАВЛЕНЫ ПО СОБЫТИЮ <span>✓</span></div><div class="kpi-value">2</div><div class="kpi-caption">Подтверждена отправка, не доставка</div></div>
+     <div class="kpi"><div class="kpi-head">ФИНАНСОВЫЙ ЭФФЕКТ <span>◷</span></div><div class="kpi-value">—</div><div class="kpi-caption">Не измерен, не придуман</div></div>
+   </div>
+   <section class="panel" id="workflow"><div class="panel-heading"><div><div class="eyebrow">CONTROL LOOP</div><h2>От источника до проверенного действия</h2></div><span class="label">HUMAN-IN-THE-LOOP</span></div>
+    <div class="pipeline"><div class="step"><span>01</span><div><b>Сообщение</b><small>Источник и конкретная цитата</small></div></div><div class="step"><span>02</span><div><b>Срок</b><small>Обязательство с дедлайном</small></div></div><div class="step"><span>03</span><div><b>Решение</b><small>Подтверждение руководителя</small></div></div><div class="step"><span>04</span><div><b>Исправление</b><small>Факт отправки по source event</small></div></div></div>
+    <p class="preview-hint">Попробуй открыть оба кейса ниже и переключить этапы доказательств. Это просмотр подготовленного сценария, не запись действий в приложение.</p>
+   </section>
+   <section class="panel cases" id="cases"><div class="panel-heading"><div><div class="eyebrow">CASE EVIDENCE</div><h2>Два подтверждённых тестовых сценария</h2></div><span class="label green">STATIC SNAPSHOT</span></div><div id="case-list" aria-live="polite"></div></section>
+   <section class="panel detail" id="detailPanel"><div class="panel-heading"><div><div class="eyebrow">SOURCE-LEVEL EVIDENCE</div><h2 id="detailTitle">Карточка кейса</h2></div><span class="label green">NO WRITE ACCESS</span></div><div id="case-actions" class="demo-actions"></div><div id="detailContent" aria-live="polite"></div></section>
+   <section class="panel"><div class="panel-heading"><div><div class="eyebrow">AUDIT / ENGINEERING</div><h2>Что действительно протестировано</h2></div><span class="label">LOCAL EVIDENCE</span></div><div class="integrity-note"><span>ⓘ</span><span>В локальном Docker подтверждены FastAPI + PostgreSQL, браузерные тесты и Grafana → On-call Agent → разрешённый синтетический ремонт. Публичный просмотр <b>не содержит</b> webhook, агентный API, ключи, реальную базу или клиентские данные.</span></div><p class="preview-hint"><a href="https://github.com/butomaya12-wq/supportpulse-ai/blob/main/docs/EVIDENCE_ONCALL_REPAIR_2026-10-24.md" target="_blank" rel="noopener noreferrer">Протокол Grafana и ремонта →</a> · <a href="https://github.com/butomaya12-wq/supportpulse-ai/blob/main/docs/COURSE_MATRIX.md" target="_blank" rel="noopener noreferrer">Матрица доказательств курса →</a></p></section>
+   <footer><span>© Maya AI Systems · SupportPulse AI</span><span>STATIC PREVIEW • Synthetic only • No customer data • Production-ready: NO</span></footer>
+ </div></main>
+</div></body></html>
