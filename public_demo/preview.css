@@ -1,0 +1,16 @@
+/* Adaptations to the existing production-shared UI theme. Static preview only. */
+.notice{background:#102a35;border:1px solid #2c5665;border-radius:14px;padding:17px 20px;margin:0 0 25px;color:#afccde;font-size:13px;line-height:1.8}
+.notice strong{color:#82ead7}.notice b{color:#edf7ff}
+.notice a,.preview-hint a{color:#81e0dc;text-decoration:underline;text-underline-offset:3px}
+.preview-hint{font-size:12px;line-height:1.9;color:#a1b3c9;margin:18px 0 0}
+.preview-fact{font-size:13px;line-height:1.7;color:#b4c4d9;margin:5px 0}
+.preview-fact span{color:#8999b1}
+.preview-fact strong{color:#e6f4fc}
+#detailPanel{scroll-margin-top:20px}
+#case-actions{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 19px}
+#case-actions .button[aria-pressed="true"], #case-list .button[aria-pressed="true"]{border-color:#63dbca}
+.case-row .case-body{min-width:0}
+.case-row .case-body small{line-height:1.7}
+.evidence p{white-space:pre-wrap;overflow-wrap:anywhere}
+button:focus-visible,a:focus-visible{outline:2px solid #7cf3d9;outline-offset:3px}
+@media(max-width:760px){.notice{font-size:12px;padding:14px}.preview-fact{font-size:12px}#case-actions .button{flex:1 1 100%}}
