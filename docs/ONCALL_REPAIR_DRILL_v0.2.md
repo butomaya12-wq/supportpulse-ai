@@ -9,7 +9,7 @@ The [AI Dev Tools Zoomcamp 2026 Project 2 rubric](https://github.com/DataTalksCl
 ## Causal evidence and safety design
 
 - The optional `compose.repair.yaml` overlay enables `SP_REPAIR_DRILL_ENABLED=1` and a private strong repair token on `web` and `oncall` only; disabled in all other deployments.
-- Existing local secret from `.env.oncall` is reused, never printed or checked into git; token is validated with constant-time comparison and distinct mandatory intent headers.
+- A **second independent secret** `SP_REPAIR_TOKEN` is created in the same gitignored `.env.oncall` file. Grafana knows only the existing webhook credential; only web and oncall receive the separate repair credential. Neither secret is printed or checked into git. Token comparison is constant-time and intent headers are mandatory.
 - Operator explicitly arms **one synthetic failure** using `POST /api/v1/demo/repair-drill/arm`. A 10-minute in-memory maximum lifetime and restart safety bound its impact. While broken, a **normal supervisor request** `GET /api/v1/overview` returns 503; `/health` stays healthy. Business PostgreSQL, customer cases, accounts, services, source records and actual commitments are not altered.
 - Real Grafana 5xx metric alert sends a scoped, Bearer-authenticated webhook.
 - The agent **probes ordinary overview and /health**. Only if overview is 503 AND health is 200 does it fetch its dedicated `state` endpoint and require `state=BROKEN`, `data_mode=SYNTHETIC_ONLY`, and a valid integer revision.
@@ -22,7 +22,27 @@ The [AI Dev Tools Zoomcamp 2026 Project 2 rubric](https://github.com/DataTalksCl
 
 ## Start on owner's Mac — preserve all existing volumes and host mappings
 
-From the current `supportpulse-ai` directory:
+From the current `supportpulse-ai` directory, **generate the independent repair secret once**. Do not overwrite your existing webhook credential:
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+import os, secrets
+path = Path(".env.oncall")
+if not path.exists():
+    raise SystemExit("Missing .env.oncall: keep the original Grafana webhook secret")
+content = path.read_text()
+if any(line.startswith("SP_REPAIR_TOKEN=") for line in content.splitlines()):
+    print("Separate repair secret already exists; unchanged.")
+else:
+    with path.open("a") as out:
+        out.write("SP_REPAIR_TOKEN=" + secrets.token_hex(32) + "\\n")
+    os.chmod(path, 0o600)
+    print("Separate repair secret created locally, without printing it.")
+PY
+```
+
+Then start all five overlays:
 
 ```bash
 git pull --ff-only
@@ -37,13 +57,13 @@ docker compose --env-file .env.oncall \
   -f compose.oncall.yaml -f compose.repair.yaml ps
 ```
 
-**Do not delete or recreate `.env.oncall`**. Do not run `down -v`. Keep owner's uncommitted `compose.yaml` Mac port override to `127.0.0.1:18080:8000`.
+**Do not delete or recreate `.env.oncall`**. Never paste either secret into ChatGPT. Do not run `down -v`. Keep owner's uncommitted `compose.yaml` Mac port override to `127.0.0.1:18080:8000`.
 
 ## Real runtime acceptance
 
 1. Confirm four services healthy (PostgreSQL, web, Grafana, oncall) and Grafana Alerting → rule `SupportPulse: critical overview returns HTTP 5xx` is Normal, recipient `supportpulse-local-oncall` provisioned.
 2. Check ordinary supervisor overview before arming = HTTP 200.
-3. Load private token into shell (never display it or print it in output):
+3. Load **repair** token into shell (never display it or print it in output):
 
 ```bash
 set -a
@@ -55,7 +75,7 @@ set +a
 
 ```bash
 curl -sS -X POST \
- -H "Authorization: Bearer ${SP_ONCALL_WEBHOOK_TOKEN}" \
+ -H "Authorization: Bearer ${SP_REPAIR_TOKEN}" \
  -H 'X-SupportPulse-Repair-Drill: arm' \
  http://127.0.0.1:18080/api/v1/demo/repair-drill/arm
 ```
