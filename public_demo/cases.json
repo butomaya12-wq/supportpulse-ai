@@ -1,0 +1,68 @@
+{
+  "mode": "SYNTHETIC_STATIC_PREVIEW",
+  "as_of": "2026-10-24",
+  "cases": [
+    {
+      "id": 1,
+      "conversation_id": "demo-lead-001",
+      "source_id": "demo-instagram",
+      "channel": "instagram-synthetic",
+      "manager": "demo-manager-001",
+      "due_at": "2026-10-22T13:00:00Z",
+      "sent_at": "2026-10-22T14:12:00Z",
+      "late_minutes": 72,
+      "review": "Обещание не выполнено до указанного срока; источник синхронизирован.",
+      "events": [
+        {
+          "id": "msg-001",
+          "kind": "customer_message",
+          "at": "2026-10-22T07:05:00Z",
+          "message": "Здравствуйте! Сколько стоит кухня на заказ?"
+        },
+        {
+          "id": "msg-002",
+          "kind": "manager_message",
+          "at": "2026-10-22T07:18:00Z",
+          "message": "Отправлю расчёт сегодня до 16:00."
+        },
+        {
+          "id": "msg-003",
+          "kind": "quote_sent",
+          "at": "2026-10-22T14:12:00Z",
+          "message": "Отправила расчёт, файл quote-demo-001.pdf (синтетическое событие отправки)."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "conversation_id": "demo-lead-002",
+      "source_id": "demo-instagram-002",
+      "channel": "instagram-synthetic",
+      "manager": "demo-manager-001",
+      "due_at": "2026-10-22T16:00:00Z",
+      "sent_at": "2026-10-22T17:42:00Z",
+      "late_minutes": 102,
+      "review": "Обещание не выполнено до указанного срока; источник синхронизирован.",
+      "events": [
+        {
+          "id": "case2-msg-001",
+          "kind": "customer_message",
+          "at": "2026-10-22T08:05:00Z",
+          "message": "Когда сможете рассчитать стоимость шкафа на заказ?"
+        },
+        {
+          "id": "case2-msg-002",
+          "kind": "manager_message",
+          "at": "2026-10-22T08:18:00Z",
+          "message": "Отправлю расчёт сегодня до 19:00."
+        },
+        {
+          "id": "case2-msg-003",
+          "kind": "quote_sent",
+          "at": "2026-10-22T17:42:00Z",
+          "message": "Синтетическое подтверждение отправки расчёта шкафа."
+        }
+      ]
+    }
+  ]
+}
