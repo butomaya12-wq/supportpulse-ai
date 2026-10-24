@@ -4,8 +4,8 @@ services:
   web:
     environment:
       SP_REPAIR_DRILL_ENABLED: "1"
-      SP_REPAIR_TOKEN: ${SP_ONCALL_WEBHOOK_TOKEN:?requires .env.oncall}
+      SP_REPAIR_TOKEN: ${SP_REPAIR_TOKEN:?generate distinct repair secret in .env.oncall}
   oncall:
     environment:
       SP_REPAIR_DRILL_ENABLED: "1"
-      SP_REPAIR_TOKEN: ${SP_ONCALL_WEBHOOK_TOKEN:?requires .env.oncall}
+      SP_REPAIR_TOKEN: ${SP_REPAIR_TOKEN:?generate distinct repair secret in .env.oncall}
