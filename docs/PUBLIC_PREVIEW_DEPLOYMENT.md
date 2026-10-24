@@ -58,3 +58,17 @@ For the full 3-point CI/CD criterion later:
 - External evidence/documentation links are regular links opened by the visitor. No third-party script is loaded.
 - Explicit `STATIC PREVIEW`, `SYNTHETIC`, financial-impact-unknown and no-delivery-confirmation labels throughout.
 - No existing Mac compose.yaml, ports, Docker volumes, Postgres cases or oncall audit modified.
+
+## Verified provider deployment metadata (2026-10-24)
+
+- **Render service name:** `supportpulse-ai-review-demo`.
+- **Service ID:** `srv-dbeg1vu7bikc738b6rsg`, [dashboard](https://dashboard.render.com/static/srv-dbeg1vu7bikc738b6rsg).
+- **Public URL allocated:** https://supportpulse-ai-review-demo.onrender.com
+- **Initial deploy ID:** `dep-dbeg2067bikc738b6t1g`.
+- **Initial Git SHA:** `d38d753d0cdc671f0ffa52a204efb87895a017c2` (PR #20).
+- **Deployment status:** Render reported **LIVE**, completed 2026-10-24 19:03:59 UTC, after running the exact build command `python3 scripts/build_public_preview.py`, publishing `dist/public-preview`.
+- **Service configuration:** Static Site; GitHub `main`; autoDeploy=`yes` / trigger=`commit`; **zero configured environment secrets**, no persistent disk or Postgres.
+- **Application verification:** 4/4 GitHub CI jobs passed on PR #20; CI launches Chromium against built static bundle, verifies 2 cases and 3 evidence stages, and blocks any backend `/api/` calls.
+- **External end-user HTTP proof:** **PENDING**. Render control plane says LIVE but direct HTTPS retrieval via assistant's available external checking environments failed because DNS/request was inaccessible to those environments. Owner browser verification is needed before claiming a full external acceptance pass.
+- **CD trigger proof:** Auto-deploy from GitHub main is enabled; the README update after the initial deploy should trigger a later Render deployment. Inspect actual subsequent deployment record and commit SHA before claiming tested CD.
+
