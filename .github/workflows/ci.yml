@@ -25,6 +25,10 @@ jobs:
         env:
           SP_ONCALL_WEBHOOK_TOKEN: ci-only-not-a-secret-00000000000000000000000000000000
         run: docker compose -f compose.yaml -f compose.telemetry.yaml -f compose.alerts.yaml -f compose.oncall.yaml config --quiet
+      - name: Validate explicit repair overlay (no application database changes)
+        env:
+          SP_ONCALL_WEBHOOK_TOKEN: ci-only-not-a-secret-00000000000000000000000000000000
+        run: docker compose -f compose.yaml -f compose.telemetry.yaml -f compose.alerts.yaml -f compose.oncall.yaml -f compose.repair.yaml config --quiet
       - run: docker build -t supportpulse-synthetic-ci .
       - run: docker build -f oncall/Dockerfile -t supportpulse-oncall-synthetic-ci .
   postgres-integration:
