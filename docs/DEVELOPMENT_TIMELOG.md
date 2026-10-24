@@ -62,3 +62,13 @@ Proposed table for future sessions:
 - **Session wall-time window:** user requested start of this iteration at about **2026-10-24 02:06 UTC+05** (rounded, from conversation timestamp); current checkpoint **02:15:24 UTC+05** from user-local time service. Approx. **9 minutes** of elapsed elapsed wall-clock since this marker. This is not measured active human work time; do not submit it as worked hours.
 - **User-local runtime Grafana alert proof:** **PENDING** (configuration and CI done, rule firing not yet observed). Completion timestamp not fixed until actual UI proof.
 - **Active hands-on work hours:** **UNKNOWN**, pending explicit non-overlapping work sessions and break confirmation. Do not add assistant/tool runtime and human work hours together.
+
+
+## Iteration 007 — bounded on-call webhook implementation
+
+- **Owner request / session marker:** 2026-10-24 approx. **19:18 UTC+05** (per conversation-local clock). This is a start checkpoint, **not a verified stopwatch**.
+- **Code merge:** 2026-10-24 **19:32:04 UTC+05** (2026-10-24 14:32:04 UTC); independent GitHub commit `149058afb4a06b2c83ab7e68309890f7df696a57` via PR #17.
+- **Snapshot:** 2026-10-24 **19:32:17 UTC+05**, from user-local time service; about **14 min** calendar elapsed since the approximate request marker.
+- **Deliverables:** guarded Grafana contact point, local webhook receiver, strict alert scope, read-only diagnostics, replay-safe private SQLite audit, synthetic-only Compose overlay, 56 Python tests, 3 Chromium E2E; post-merge main CI 4/4 PASS.
+- **Local Grafana-to-webhook proof:** **PENDING**; does not count as a completed live on-call operation.
+- **Human net working hours:** **UNKNOWN**. Tool execution is not necessarily owner hands-on time. Do not add this to course worked hours without user confirmation.
