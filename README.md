@@ -126,3 +126,11 @@ A separate, synthetic-only `oncall` service can consume **real Grafana webhook n
 **Status:** implemented in code, **real Grafana-to-webhook delivery on Mac still requires user acceptance**. This is deterministic runbook automation, **not an autonomous code-repair agent** and not a live LLM. Do not confuse safe diagnosis with successful remediation.
 
 Follow [the on-call setup and acceptance guide](docs/ONCALL_AGENT_v0.1.md) before running the additional overlay; the instructions avoid replacing the owner's Mac-specific compose.yaml or erasing the existing Postgres volume.
+
+## Iteration 007B — synthetic on-call **repair** demonstration
+
+The agent can now correct one explicitly armed **synthetic-only** dashboard outage, rather than merely diagnosing alerts. On real Grafana `firing`, it verifies normal overview HTTP 503, confirms the separate repair-drill gate is `BROKEN`, invokes a single secret-authenticated revision-checked `repair` endpoint, and verifies the same overview returns HTTP 200. The oncall SQLite audit records `AUTO_REPAIRED_SYNTHETIC`, the before/after HTTP status and gate revision; a later `resolved` webhook must independently confirm recovery.
+
+**This does not fix arbitrary production faults**, contains no LLM code-writing/restart/redeployment privilege, and is disabled unless `compose.repair.yaml` is explicitly added with a **separate** high-entropy local repair token. All business PostgreSQL records and older synthetic cases are untouched.
+
+See [real synthetic alert-to-repair evidence guide](docs/ONCALL_REPAIR_DRILL_v0.2.md). **On-call course points remain unclaimed until a full real local Grafana alert → agent fix → verified resolution is observed and documented.**

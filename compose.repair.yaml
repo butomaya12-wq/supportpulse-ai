@@ -1,0 +1,11 @@
+# Fifth opt-in overlay ONLY for bounded agent repair on the synthetic Mac demo.
+# Existing compose.yaml, PostgreSQL, telemetry, 503 header drill remain unchanged.
+services:
+  web:
+    environment:
+      SP_REPAIR_DRILL_ENABLED: "1"
+      SP_REPAIR_TOKEN: ${SP_REPAIR_TOKEN:?generate distinct repair secret in .env.oncall}
+  oncall:
+    environment:
+      SP_REPAIR_DRILL_ENABLED: "1"
+      SP_REPAIR_TOKEN: ${SP_REPAIR_TOKEN:?generate distinct repair secret in .env.oncall}
