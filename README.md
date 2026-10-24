@@ -118,3 +118,11 @@ Review the [observability walkthrough and privacy checklist](docs/OBSERVABILITY_
 An optional Grafana-managed alert monitors HTTP **5xx** on the supervisor's critical `GET /api/v1/overview` endpoint. A doubly opt-in, supervisor-authenticated synthetic request can generate 503 **for that request only** to prove the alert fires; other viewers and your persistent Postgres data stay unchanged. Ordinary Compose and telemetry Compose do not enable the drill.
 
 Review [safe Grafana alert trigger and recovery runbook](docs/ALERT_DRILL_RUNBOOK.md). File provisioned rule lives in [ops/grafana/alerting/overview-5xx.yaml](ops/grafana/alerting/overview-5xx.yaml) and optional third overlay is `compose.alerts.yaml`. This is a **simulated local incident**, not proof of a real customer outage, external notification or on-call agent. **Do not award the course alerting point until an owner screenshot confirms Normal → Firing → Normal.**
+
+## Iteration 007 — bounded local Grafana on-call responder
+
+A separate, synthetic-only `oncall` service can consume **real Grafana webhook notifications** when enabled through `compose.oncall.yaml`. Grafana sends them only for the existing critical overview 5xx alert through a dedicated contact point, with a locally generated private webhook secret. The responder performs fixed **read-only health and overview checks**, deduplicates replays, saves a sanitized operational audit and verifies recovery only when Grafana reports resolved and both probes pass.
+
+**Status:** implemented in code, **real Grafana-to-webhook delivery on Mac still requires user acceptance**. This is deterministic runbook automation, **not an autonomous code-repair agent** and not a live LLM. Do not confuse safe diagnosis with successful remediation.
+
+Follow [the on-call setup and acceptance guide](docs/ONCALL_AGENT_v0.1.md) before running the additional overlay; the instructions avoid replacing the owner's Mac-specific compose.yaml or erasing the existing Postgres volume.

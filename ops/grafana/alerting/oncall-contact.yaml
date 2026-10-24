@@ -1,0 +1,16 @@
+# Grafana environment substitution supplies token only at local container startup.
+# NEVER commit plaintext token. Grafana renders this as a secure credential.
+apiVersion: 1
+contactPoints:
+  - orgId: 1
+    name: supportpulse-local-oncall
+    receivers:
+      - uid: sp_local_oncall_v1
+        type: webhook
+        disableResolveMessage: false
+        settings:
+          url: http://oncall:8081/webhook
+          httpMethod: POST
+          authorization_scheme: Bearer
+          authorization_credentials: $SP_ONCALL_WEBHOOK_TOKEN
+          maxAlerts: "1"
