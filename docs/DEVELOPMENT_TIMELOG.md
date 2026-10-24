@@ -90,3 +90,14 @@ Proposed table for future sessions:
 - **Deliverables:** opt-in fail latch on normal overview, 10-minute safety expiry, separate repair secret, exact revision-scoped repair, before/after verification, oncall audit migration, 61 Python tests and existing E2E/PostgreSQL/Docker checks.
 - **Real Mac repair evidence:** PENDING. Code completion is not proof of a Grafana-triggered repair; release not completed.
 - **Human active project hours:** UNKNOWN because no independent hands-on stopwatch/break record for this interval. **Do not count wall-clock model/tool execution as user billable work.**
+
+
+### Iteration 007B owner acceptance: autonomous synthetic repair
+
+- **2026-10-24 17:03:51.130247 UTC** (= **22:03:51.130247 UTC+05**): incoming **real Grafana firing** webhook, oncall audit #3. Agent performed allowlisted `REPAIR_SYNTHETIC_OVERVIEW_GATE`: ordinary overview **503** before, **200** afterward; revision **1**; persisted `AUTO_REPAIRED_SYNTHETIC`. Separate confirmation by Grafana remained pending at this instant.
+- **2026-10-24 17:06:51.927989 UTC** (= **22:06:51.927989 UTC+05**): genuine Grafana **resolved** webhook, oncall audit #4; two read-only health checks **200/200**; `VERIFIED_RESOLVED`.
+- **Owner verification:** protected repair-drill state **READY**, revision 1, ttl 0, after the repair; 12 ordinary overview requests **503 × 6 then 200 × 6**.
+- **Artifact:** [evidence record](EVIDENCE_ONCALL_REPAIR_2026-10-24.md). **Course estimate: On-call 2/2 provisional; 20/24 overall provisional** (human reviewer not yet evaluated).
+- **Measured automated alert lifecycle:** 3 minutes 0.798 seconds between the two webhook *receipt* timestamps. This is **not agent repair latency**, since exact time the repair completed inside firing handler was not recorded separately, nor is this user working time.
+- **Net human active hours:** **UNKNOWN**. The automated incident elapsed interval must not be treated as worked time; no complete stopwatch or breaks were captured.
+- **Still missing:** separate Grafana Rule History screenshot for this repair trial and independent DB row-level non-mutation evidence.
