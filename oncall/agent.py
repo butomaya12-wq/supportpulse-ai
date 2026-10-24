@@ -140,7 +140,7 @@ def _repair_request(path: str, intent: str, method: str = "GET") -> dict | None:
     headers = _repair_header(intent)
     if path != "/api/v1/demo/repair-drill/state" and not (
         method == "POST" and re.fullmatch(
-            r"/api/v1/demo/repair-drill/repair\\?expected_revision=[1-9][0-9]{0,8}", path)):
+            r"/api/v1/demo/repair-drill/repair\?expected_revision=[1-9][0-9]{0,8}", path)):
         return None
     try:
         req = Request(_target_url(path), headers=headers, method=method,
