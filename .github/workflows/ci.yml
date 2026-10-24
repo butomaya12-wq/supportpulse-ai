@@ -33,6 +33,8 @@ jobs:
           SP_REPAIR_TOKEN: ci-only-different-secret-11111111111111111111111111111111
         run: docker compose -f compose.yaml -f compose.telemetry.yaml -f compose.alerts.yaml -f compose.oncall.yaml -f compose.repair.yaml config --quiet
       - run: docker build -t supportpulse-synthetic-ci .
+      - name: Build isolated read-only cloud entrypoint
+        run: docker build -f Dockerfile.staging -t supportpulse-staging-ci .
       - run: docker build -f oncall/Dockerfile -t supportpulse-oncall-synthetic-ci .
   postgres-integration:
     runs-on: ubuntu-latest
@@ -58,7 +60,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements-dev.txt
-      - run: pytest -q tests/test_postgres.py
+      - run: pytest -q tests/test_postgres.py tests/test_cloud_postgres.py
   browser-e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 20
