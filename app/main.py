@@ -16,6 +16,7 @@ from .service import as_utc, audit, evaluate, finding_detail, get_action, get_fi
 from .ai_extract import provider_name, propose
 from .telemetry import setup_telemetry, add_stdout_safe_log, instrument_request
 from .fault_drill import synthetic_overview_failure_enabled
+from . import repair_drill
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -209,7 +210,28 @@ def get_overview(request: Request, user: Principal = Depends(require_user), db: 
     # error, even when the local alert-drill overlay is enabled.
     if synthetic_overview_failure_enabled(request):
         raise HTTPException(503, "SYNTHETIC_ONLY: overview unavailable during controlled drill")
+    if repair_drill.is_broken():
+        raise HTTPException(503, "SYNTHETIC_ONLY: recoverable overview gate is BROKEN")
     return overview(db, user.tenant_id)
+
+
+
+@app.get("/api/v1/demo/repair-drill/state")
+def get_repair_drill_state(request: Request):
+    repair_drill.require_token(request, "inspect")
+    return repair_drill.state()
+
+
+@app.post("/api/v1/demo/repair-drill/arm")
+def arm_repair_drill(request: Request):
+    repair_drill.require_token(request, "arm")
+    return repair_drill.arm()
+
+
+@app.post("/api/v1/demo/repair-drill/repair")
+def apply_repair_drill(request: Request, expected_revision: int = Query(ge=1)):
+    repair_drill.require_token(request, "repair")
+    return repair_drill.repair(expected_revision)
 
 
 @app.get("/api/v1/findings")
