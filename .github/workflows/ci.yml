@@ -136,3 +136,62 @@ jobs:
       - name: Print app logs when browser tests fail
         if: failure()
         run: tail -n 150 /tmp/supportpulse-e2e-web.log
+
+  schema-migration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: supportpulse_migrate
+          POSTGRES_PASSWORD: disposable-schema-ci-only
+          POSTGRES_DB: supportpulse_stage_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U supportpulse_migrate -d supportpulse_stage_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      SP_MODE: synthetic_staging
+      SP_STAGING_SYNTHETIC_ONLY: "YES"
+      SP_SCHEMA_MIGRATE_CONFIRM: MIGRATE_ISOLATED_STAGING_ONLY
+      SP_SCHEMA_MIGRATION_ROLE: migrator
+      SP_STAGE_DB_NAME: supportpulse_stage_ci
+      DATABASE_URL: postgresql+psycopg://supportpulse_migrate:disposable-schema-ci-only@127.0.0.1:5432/supportpulse_stage_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-migrate.txt
+      - name: Apply baseline migration to disposable PostgreSQL
+        run: alembic upgrade head
+      - name: Detect ORM-to-database drift
+        run: alembic check
+      - name: Confirm schema and applied version
+        run: |
+          python - <<'PY'
+          import os
+          from sqlalchemy import create_engine, inspect, text
+          engine = create_engine(os.environ["DATABASE_URL"])
+          with engine.connect() as conn:
+              assert conn.execute(text("select version_num from alembic_version")).scalar_one() == "sp_0001_baseline"
+              tables = set(inspect(conn).get_table_names())
+              assert {"sources", "source_events", "commitments", "findings",
+                      "corrective_actions", "audit", "alembic_version"} <= tables
+          print("PASS: baseline schema, six core tables and revision match")
+          PY
+      - name: Verify production migration fence rejects execution
+        run: |
+          if SP_MODE=production alembic current 2>/dev/null; then
+            echo "FAIL: production migration unexpectedly permitted"
+            exit 1
+          fi
+          echo "PASS: production migration cannot run"
+      - name: Test migration downgrade only in throwaway CI database
+        run: |
+          alembic downgrade base
+          alembic upgrade head
+          alembic check
