@@ -1,0 +1,37 @@
+# Optional fourth overlay: compose.yaml + compose.telemetry.yaml +
+# compose.alerts.yaml + compose.oncall.yaml. Never touches owner's Postgres volume.
+services:
+  oncall:
+    build:
+      context: .
+      dockerfile: oncall/Dockerfile
+    restart: unless-stopped
+    environment:
+      SP_MODE: synthetic_local
+      SP_ONCALL_WEBHOOK_TOKEN: ${SP_ONCALL_WEBHOOK_TOKEN:?provide a generated secret using --env-file .env.oncall}
+      SP_SUPERVISOR_TOKEN: ${SP_SUPERVISOR_TOKEN:-dev-only-supervisor-token}
+      SP_ONCALL_TARGET: http://web:8000
+      SP_ONCALL_DB: /data/oncall.sqlite3
+    ports:
+      - "127.0.0.1:18081:8081"
+    volumes:
+      - oncall_audit:/data
+    depends_on:
+      web:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8081/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+  telemetry:
+    environment:
+      SP_ONCALL_WEBHOOK_TOKEN: ${SP_ONCALL_WEBHOOK_TOKEN:?required to provision authenticated webhook}
+    depends_on:
+      oncall:
+        condition: service_healthy
+    volumes:
+      - ./ops/grafana/alerting/overview-5xx-oncall.yaml:/otel-lgtm/grafana/conf/provisioning/alerting/supportpulse-overview-5xx.yaml:ro
+      - ./ops/grafana/alerting/oncall-contact.yaml:/otel-lgtm/grafana/conf/provisioning/alerting/supportpulse-oncall-contact.yaml:ro
+volumes:
+  oncall_audit:
