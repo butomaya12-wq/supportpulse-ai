@@ -101,3 +101,13 @@ Proposed table for future sessions:
 - **Measured automated alert lifecycle:** 3 minutes 0.798 seconds between the two webhook *receipt* timestamps. This is **not agent repair latency**, since exact time the repair completed inside firing handler was not recorded separately, nor is this user working time.
 - **Net human active hours:** **UNKNOWN**. The automated incident elapsed interval must not be treated as worked time; no complete stopwatch or breaks were captured.
 - **Still missing:** separate Grafana Rule History screenshot for this repair trial and independent DB row-level non-mutation evidence.
+
+
+### Iteration 008 — public reviewer deployment and verified auto-CD
+
+- **2026-10-24 19:03:12 UTC**: [PR #20](https://github.com/butomaya12-wq/supportpulse-ai/pull/20) read-only public reviewer preview merged into `main` as `d38d753d0cdc671f0ffa52a204efb87895a017c2`. Includes two synthetic source-linked cases, strict zero-credential static bundle, Python build validation, and Chromium navigation/no-API tests.
+- **2026-10-24 19:03:28–19:03:59 UTC**: Render created static service `supportpulse-ai-review-demo`, initial deploy `dep-dbeg2067bikc738b6t1g` status **LIVE**. This is a public static FRONTEND, not FastAPI/PostgreSQL or production system.
+- **2026-10-24 19:06:43–19:07:07 UTC**: Render automatically deployed README/main commit `6d87306` (`dep-dbeg3gs9v7es73cg4gr0`, `trigger=new_commit`, **LIVE**). This confirms functioning auto-CD, but not CI-gated stages/manual prod release.
+- **2026-10-24 19:08:09 UTC**: [independent GitHub Actions HTTPS smoke](https://github.com/butomaya12-wq/supportpulse-ai/actions/runs/40123896342) **PASS**, fetching public HTML and two immutable synthetic case records from `https://supportpulse-ai-review-demo.onrender.com`.
+- **Course estimate:** Deployment 2/2 and CI/CD 2/3, **both provisional**: deployment is a reviewer frontend only, graders may demand a hosted working API; CI-gated dev → human-gated prod and rollback are not implemented. Total **23/24 provisional** pending human review.
+- **Human working time:** still **UNKNOWN**. Render/GitHub timestamps prove separate milestones and automation duration, **not** net time actively worked by the owner.
