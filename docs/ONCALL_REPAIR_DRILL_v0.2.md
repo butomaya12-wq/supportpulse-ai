@@ -36,7 +36,7 @@ if any(line.startswith("SP_REPAIR_TOKEN=") for line in content.splitlines()):
     print("Separate repair secret already exists; unchanged.")
 else:
     with path.open("a") as out:
-        out.write("SP_REPAIR_TOKEN=" + secrets.token_hex(32) + "\\n")
+        out.write("SP_REPAIR_TOKEN=" + secrets.token_hex(32) + "\n")
     os.chmod(path, 0o600)
     print("Separate repair secret created locally, without printing it.")
 PY
