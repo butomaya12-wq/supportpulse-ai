@@ -1,6 +1,8 @@
 # SupportPulse AI — explainable customer-follow-up control
 
-**Status: Engineering iteration 004 / synthetic local demo / NOT production-ready.**
+**Current (2026-10-24):** Local FastAPI/PostgreSQL/Grafana/on-call synthetic testbed and separate [public **read-only reviewer demo**](https://supportpulse-ai-review-demo.onrender.com). **NOT production-ready; no customer integrations or cloud backend.** Earlier iteration notes below are historical and may describe now-completed acceptance as pending.
+
+**Public deployment:** [Open SupportPulse AI reviewer demo](https://supportpulse-ai-review-demo.onrender.com) · [Render deployment evidence](docs/PUBLIC_PREVIEW_DEPLOYMENT.md) · [on-call repair trial evidence](docs/EVIDENCE_ONCALL_REPAIR_2026-10-24.md). The public demo contains only 2 synthetic static case snapshots; local database, auth tokens, APIs and agent are **not** exposed. [Real staging/production deployment gap](https://github.com/butomaya12-wq/supportpulse-ai/issues/21).
 
 SupportPulse AI is an independent application under development at Maya AI Systems. It aims to help teams identify a verifiable broken commitment in a customer conversation, confirm a case with a human reviewer, assign remediation, and track a source-confirmed action. The larger vision includes omnichannel communication quality and operational economics; those broader capabilities are NOT implemented. Iteration 004 introduces source-linked promise **proposals**, still requiring human approval.
 
