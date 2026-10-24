@@ -21,7 +21,7 @@ This is an **assistant's evidence-based estimate**, NOT a reviewer-assigned scor
 | 9 | CI/CD (3) | **1** | GitHub Actions runs tests on PRs; **CD / dev + prod release / rollback are not implemented** |
 | 10 | Observability (2) | **2 (provisional)** | Owner locally verified a key dashboard request: Tempo trace `GET /api/v1/overview` HTTP 200 with trace ID `2c250120628f398504f235b20b875b0e`, Loki `http.completed` with **exactly the same** ID, and Prometheus `supportpulse_http_requests_total` series. CI tests safe structured instrumentation. **Core multi-request business workflow still needs separate evidence; peer reviewer decides**. See [Issue #12](https://github.com/butomaya12-wq/supportpulse-ai/issues/12). |
 | 11 | Alerting on User Impact (1) | **1 (provisional)** | [Grafana impact alert rule](../ops/grafana/alerting/overview-5xx.yaml) loaded in local Grafana. Owner generated **12/12 synthetic HTTP 503** and observed real state history **Alerting 2026-10-24 18:41:00 → Normal 18:43:10**. Critical supervisor overview route, static Prometheus 5xx labels. Ordinary HTTP 200 after drill and reviewer-accessible screenshot archiving still pending; [Issue #14](https://github.com/butomaya12-wq/supportpulse-ai/issues/14). |
-| 12 | On-Call Agent (2) | **0** | No alert-triggered bounded responder with demonstrated safe fix |
+| 12 | On-Call Agent (2) | **0** | Real Grafana firing and resolved webhooks received; read-only diagnostics and verification logged (2026-10-24). An actual repair by the responder is still missing, so official criterion remains 0/2. Issue #16. |
 
 **Total provisional: 18/24**, subject to human peer-review scoring and evidence completeness.
 
