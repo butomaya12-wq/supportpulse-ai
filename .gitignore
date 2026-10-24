@@ -6,3 +6,5 @@ __pycache__/
 *.sqlite3
 *.py[cod]
 .DS_Store
+.env.oncall
+oncall/*.sqlite3
