@@ -81,3 +81,12 @@ Proposed table for future sessions:
 - **Verification:** owner retrieved event ledger via authenticated localhost `GET /events`, response HTTP 200. Synthetic-only; no customer data or autonomous repair.
 - These event timestamps measure a **2 min 59 sec automated alert lifecycle**, NOT the total project duration, net human work hours, or time the assistant was actively coding. Those remain separate.
 - **Course rubric:** on-call 0/2 pending actual safe repair. No course submission claimed.
+
+
+### Iteration 007B — actual repair implementation milestone
+
+- **2026-10-24 15:48:22 UTC** (= **20:48:22 UTC+05**): [PR #18](https://github.com/butomaya12-wq/supportpulse-ai/pull/18) merged, immutable commit `747964932044e43b8ca9e0cfc979c98b196535e2`. Independent GitHub timestamp.
+- **2026-10-24 20:48:30 UTC+05**: current-time snapshot via user-local time service (8 seconds after merge).
+- **Deliverables:** opt-in fail latch on normal overview, 10-minute safety expiry, separate repair secret, exact revision-scoped repair, before/after verification, oncall audit migration, 61 Python tests and existing E2E/PostgreSQL/Docker checks.
+- **Real Mac repair evidence:** PENDING. Code completion is not proof of a Grafana-triggered repair; release not completed.
+- **Human active project hours:** UNKNOWN because no independent hands-on stopwatch/break record for this interval. **Do not count wall-clock model/tool execution as user billable work.**
