@@ -1,0 +1,26 @@
+# PROPOSAL ONLY — does not deploy until explicitly applied in Render.
+# Keep the already-live public STATIC preview unmanaged by this Blueprint.
+# Create, migrate, seed, and secure an independent free staging Postgres FIRST.
+# Database URL MUST contain the read-only staging role, never the DB owner.
+services:
+  - type: web
+    name: supportpulse-ai-stage-reader
+    runtime: docker
+    region: virginia
+    plan: free
+    branch: main
+    dockerfilePath: ./Dockerfile.staging
+    dockerContext: .
+    autoDeployTrigger: checksPass
+    healthCheckPath: /health
+    envVars:
+      - key: SP_MODE
+        value: synthetic_staging
+      - key: SP_STAGING_SYNTHETIC_ONLY
+        value: "YES"
+      - key: SP_STAGE_ALLOWED_HOSTS
+        value: supportpulse-ai-stage-reader.onrender.com
+      - key: DATABASE_URL
+        sync: false
+      - key: SP_STAGE_REVIEWER_TOKEN
+        sync: false

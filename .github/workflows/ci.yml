@@ -159,6 +159,8 @@ jobs:
       SP_SCHEMA_MIGRATE_CONFIRM: MIGRATE_ISOLATED_STAGING_ONLY
       SP_SCHEMA_MIGRATION_ROLE: migrator
       SP_STAGE_DB_NAME: supportpulse_stage_ci
+      SP_STAGE_BOOTSTRAP_CONFIRM: BOOTSTRAP_NEW_DISPOSABLE_STAGE_ONLY
+      SP_STAGE_READ_PASSWORD: ci-only-ephemeral-reader-password-with-at-least-60-characters
       DATABASE_URL: postgresql+psycopg://supportpulse_migrate:disposable-schema-ci-only@127.0.0.1:5432/supportpulse_stage_ci
     steps:
       - uses: actions/checkout@v4
@@ -182,6 +184,70 @@ jobs:
               assert {"sources", "source_events", "commitments", "findings",
                       "corrective_actions", "audit", "alembic_version"} <= tables
           print("PASS: baseline schema, six core tables and revision match")
+          PY
+
+      - name: Create isolated staging reader role and synthetic source-backed case
+        run: python -m scripts.bootstrap_staging
+      - name: Confirm reader cannot UPDATE or CREATE
+        run: |
+          python - <<'PY'
+          import os
+          from sqlalchemy import create_engine, text
+          from sqlalchemy.engine import make_url
+          from sqlalchemy.exc import DBAPIError
+          u = make_url(os.environ["DATABASE_URL"]).set(username="supportpulse_stage_reader", password=os.environ["SP_STAGE_READ_PASSWORD"])
+          engine = create_engine(u)
+          for stmt in ("UPDATE sources SET health = 'BROKEN'", "CREATE TABLE forbidden_stage_write(id integer)"):
+              try:
+                  with engine.begin() as conn:
+                      conn.execute(text(stmt))
+              except DBAPIError:
+                  continue
+              raise AssertionError("Reader unexpectedly had write privileges")
+          engine.dispose()
+          print("PASS: staging reader has no table writes or DDL")
+          PY
+      - name: Serve actual staging FastAPI with restricted PG login, then live HTTP smoke
+        run: |
+          python - <<'PY'
+          import os, sys, subprocess, time
+          from urllib.request import urlopen
+          from sqlalchemy.engine import make_url
+          db = make_url(os.environ["DATABASE_URL"]).set(username="supportpulse_stage_reader", password=os.environ["SP_STAGE_READ_PASSWORD"])
+          env = os.environ.copy()
+          env.update({
+              "DATABASE_URL": db.render_as_string(hide_password=False),
+              "SP_STAGE_ALLOWED_HOSTS": "127.0.0.1",
+              "SP_STAGE_REVIEWER_TOKEN": "ci-only-ephemeral-staging-reviewer-secret-long-enough-not-for-reuse",
+              "RENDER_GIT_COMMIT": os.environ["GITHUB_SHA"],
+              "EXPECTED_STAGE_SHA": os.environ["GITHUB_SHA"],
+              "SP_CI_LOCAL_SMOKE": "YES",
+              "STAGING_API_URL": "http://127.0.0.1:18083",
+          })
+          server = subprocess.Popen([sys.executable, "-m", "uvicorn", "app.cloud:app",
+                                     "--host", "127.0.0.1", "--port", "18083"],
+                                    env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+          try:
+              for i in range(40):
+                  if server.poll() is not None:
+                      raise RuntimeError("Staging server exited without health")
+                  try:
+                      with urlopen("http://127.0.0.1:18083/health", timeout=2) as res:
+                          if res.status == 200:
+                              break
+                  except Exception:
+                      time.sleep(0.5)
+              else:
+                  raise RuntimeError("Staging server failed health probe")
+              subprocess.run([sys.executable, "scripts/smoke_staging.py"],
+                             env=env, check=True)
+          finally:
+              server.terminate()
+              try:
+                  server.wait(timeout=5)
+              except subprocess.TimeoutExpired:
+                  server.kill()
+                  server.wait()
           PY
       - name: Verify production migration fence rejects execution
         run: |
