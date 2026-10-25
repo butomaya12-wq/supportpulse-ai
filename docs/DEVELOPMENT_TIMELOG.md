@@ -111,3 +111,24 @@ Proposed table for future sessions:
 - **2026-10-24 19:08:09 UTC**: [independent GitHub Actions HTTPS smoke](https://github.com/butomaya12-wq/supportpulse-ai/actions/runs/40123896342) **PASS**, fetching public HTML and two immutable synthetic case records from `https://supportpulse-ai-review-demo.onrender.com`.
 - **Course estimate:** Deployment 2/2 and CI/CD 2/3, **both provisional**: deployment is a reviewer frontend only, graders may demand a hosted working API; CI-gated dev → human-gated prod and rollback are not implemented. Total **23/24 provisional** pending human review.
 - **Human working time:** still **UNKNOWN**. Render/GitHub timestamps prove separate milestones and automation duration, **not** net time actively worked by the owner.
+
+## Iteration 009A–009B — staged cloud safety and schema groundwork
+
+- **2026-10-24 20:35:43 UTC:** [PR #22](https://github.com/butomaya12-wq/supportpulse-ai/pull/22) opened as draft (GitHub PR creation timestamp). This is a code milestone, not a session start measured by a stopwatch.
+- **2026-10-24 20:37:33 UTC:** PR #22 merged as `15d8ffe8418ebf8b6ba4a9bb136e0ea4234a6229`. Cloud staging API entrypoint committed; PR CI 4/4 PASS.
+- **2026-10-24 20:44:18 UTC:** PR #23 merged as `9ef907e756b27e103bb9c41b0a573774d3ca2548`. Alembic migrations CI 5/5 PASS.
+- **Observable GitHub interval between PR #22 creation and PR #23 merge:** **8 min 35 sec**. This is a narrow, overlapping sequence of recorded code/review/CI events; **NOT** all of iterations 009A–009B, human active hours or total elapsed project time.
+- **Human hands-on hours for these iterations:** **UNKNOWN**; the user has not confirmed exact non-overlapping work spans or excluded breaks.
+- **Current course estimate:** provisional 23/24, unchanged. Staging/production release and rollback not yet demonstrated.
+
+## Iteration 009C — isolated staging bootstrap, continuing project
+
+- **Explicit owner request to continue:** 2026-10-25, current chat. User also reaffirmed tracking total project creation time.
+- **New working-session clock checkpoint:** **2026-10-25 17:02:51 UTC** (= 22:02:51 UTC+05), actual user-local time service reading. Not evidence of continuous active human work.
+- **Cumulative calendar span at checkpoint from provisional engineering start (2026-10-22 19:49:40 UTC):** **69 h 13 min 11 sec**. Includes sleep, idle periods and unrelated activities.
+- **Cumulative calendar span at checkpoint from original saved planning blueprint (2026-10-22 18:14:27 UTC):** **70 h 48 min 24 sec**.
+- **Active user time:** STILL UNKNOWN. Do not convert the calendar span or the assistant's coding/CI elapsed intervals into billable work hours.
+- **Engineering scope:** protected synthetic staging PostgreSQL role, one-time fixture-only bootstrap, new live-HTTP contract smoke, and proposed un-applied Render CI-gated staging Blueprint. Exact code/CI/merge timestamps will be recorded after each observed milestone.
+- **Project completion clock:** still running, not finalized; do not assign a finished time before full acceptance.
+
+**Accounting principle:** Maintain separate fields for (1) project calendar age, (2) separately observed assistant-led coding/testing windows, (3) owner-confirmed human working time minus breaks, and (4) automated CI/deploy runtime. Never add these fields to each other as if they were independent human labor.
