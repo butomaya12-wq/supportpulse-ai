@@ -187,7 +187,7 @@ jobs:
           PY
 
       - name: Create isolated staging reader role and synthetic source-backed case
-        run: python scripts/bootstrap_staging.py
+        run: python -m scripts.bootstrap_staging
       - name: Confirm reader cannot UPDATE or CREATE
         run: |
           python - <<'PY'
