@@ -1,6 +1,6 @@
 # Iteration 009C — reproducible synthetic staging, before Render activation
 
-**State: staged code / CI proof pending; NO cloud PostgreSQL or FastAPI service created.**
+**State: code merged; isolated Free cloud PostgreSQL provisioned but schema and runtime API NOT deployed. No customer data.**
 Parent: [Issue #21](https://github.com/butomaya12-wq/supportpulse-ai/issues/21).
 
 ## What ships
@@ -57,3 +57,14 @@ The temporary reviewer token is shared and does not identify each person. It is 
 ## Measuring project time
 
 The canonical ledger is `docs/DEVELOPMENT_TIMELOG.md`. Its first planning artifact and provisional engineering-start timestamps remain unchanged. Log this iteration's GitHub PR and CI milestones as **observed engineering events**, not user hands-on hours. Resume human time tracking with explicit non-overlapping working sessions and breaks.
+
+## Verified 25 October 2026 milestone (UTC)
+
+- [PR #24](https://github.com/butomaya12-wq/supportpulse-ai/pull/24) was merged as `1e5132a0b27e8dbf154007ec62756fb2c637c68e` at **17:14:57 UTC**. PR CI **5/5 passed** (API, Compose/Docker, PostgreSQL, migration + live HTTP staging smoke, browser E2E).
+- Render created a separate database resource: **`supportpulse-stage-cloud`**, id `dpg-dbf3ia8ae00c73el56r0-a`, PostgreSQL **16**, region **virginia**, plan **free**, actual db name `supportpulse_stage_cloud`. [Render database dashboard](https://dashboard.render.com/d/dpg-dbf3ia8ae00c73el56r0-a).
+- **Free DB created at 2026-10-25 17:15:21 UTC; expires 2026-11-24 17:15:21 UTC.** It has no managed backups. At the last inspection it was still `creating`.
+- The provider returned `ipAllowList: []`: external queries were blocked. A read-only connectivity attempt failed because no external address is allowlisted. **No migration, SQL bootstrap, role or synthetic fixture has been applied to the Render database.** The previous CI proof used **disposable GitHub Actions PostgreSQL**, NOT this newly created cloud DB.
+- **Next owner-assisted step:** after Render reports available, allowlist the trusted Mac's current public IP temporarily in Render Networking; securely copy the database **external URL** into a shell environment on that Mac (never to chat). Run the reviewed explicit migration/bootstrap commands above, then restore the most restrictive network rules compatible with the deployed API's private connection. Do not allow `0.0.0.0/0`.
+- No Render web service or Blueprint has been activated. No paid resources created. The existing [public static reviewer demo](https://supportpulse-ai-review-demo.onrender.com) remains independent.
+
+**Important distinction:** cloud database resource existence is not evidence of schema readiness or an operational remote API.
