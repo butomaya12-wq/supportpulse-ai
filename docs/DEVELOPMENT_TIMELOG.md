@@ -132,3 +132,16 @@ Proposed table for future sessions:
 - **Project completion clock:** still running, not finalized; do not assign a finished time before full acceptance.
 
 **Accounting principle:** Maintain separate fields for (1) project calendar age, (2) separately observed assistant-led coding/testing windows, (3) owner-confirmed human working time minus breaks, and (4) automated CI/deploy runtime. Never add these fields to each other as if they were independent human labor.
+
+### Iteration 009C — verified code/CI/cloud milestones (25 October 2026)
+
+- **2026-10-25 17:14:57 UTC:** [PR #24](https://github.com/butomaya12-wq/supportpulse-ai/pull/24) merged to `main` as `1e5132a0b27e8dbf154007ec62756fb2c637c68e` (GitHub immutable commit timestamp).
+- **PR CI:** 5/5 SUCCESS: Python API, PostgreSQL integration, schema migration and read-only role validation with live FastAPI HTTP smoke, Docker/Compose, Chromium E2E. CI test and deploy time are automated activity, not owner labor.
+- **2026-10-25 17:15:21 UTC:** Render Free PostgreSQL `supportpulse-stage-cloud` resource created; db name `supportpulse_stage_cloud`, [dashboard](https://dashboard.render.com/d/dpg-dbf3ia8ae00c73el56r0-a); expiry recorded by provider as **2026-11-24 17:15:21 UTC**. The cloud database had not been migrated/seeded and external access was restricted at checkpoint.
+- **2026-10-25 17:16:13 UTC** (22:16:13 UTC+05): actual user-local clock checkpoint during this assistant-led session.
+- **Session wall-time since 17:02:51 UTC:** **13 min 22 sec**. This is an observed **assistant/session calendar window**, which includes tools/CI/idle, NOT confirmed owner active work time or actual exclusive human-hours.
+- **Project calendar span since provisional engineering start at 2026-10-22 19:49:40 UTC:** **69 h 26 min 33 sec**. Includes nights, all idle periods and other activities.
+- **Project calendar span since first saved planning document at 2026-10-22 18:14:27 UTC:** **71 h 01 min 46 sec**.
+- **Net active owner working hours:** **UNKNOWN**. No nonoverlapping user-confirmed work/break intervals; do not report 69+ hours worked or add this assistant window to owner hours.
+- **Project completion:** NOT achieved. Staging cloud schema/API and controlled production release/rollback are still pending.
+
