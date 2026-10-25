@@ -39,7 +39,7 @@ DATABASE_URL=<secret owner/migrator PostgreSQL+psycopg URL>
 python -m pip install -r requirements-migrate.txt
 alembic upgrade head
 alembic check
-python scripts/bootstrap_staging.py
+python -m scripts.bootstrap_staging
 ```
 
 5. **Before connecting a public web service** independently verify that `supportpulse_stage_reader` can SELECT but cannot UPDATE, INSERT, CREATE TABLE or read other tenant data via the API. It must use its own secret password and its own `postgresql+psycopg://` URL. Never send the migration-owner URL to web runtime.
